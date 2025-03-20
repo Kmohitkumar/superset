@@ -31,7 +31,8 @@ const parsedEnvArg = () => {
   return { ...process.env, ...envArgs };
 };
 const { supersetPort = 8088, superset: supersetUrl = null } = parsedEnvArg();
-const backend = (supersetUrl || `http://localhost:${supersetPort}`).replace(
+// Care-life superset dashboard backend server ip address
+const backend = (supersetUrl || `http://183.82.99.107:${supersetPort}`).replace(
   '//+$/',
   '',
 ); // strip ending backslash
