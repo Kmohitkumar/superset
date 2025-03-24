@@ -276,9 +276,10 @@ class Chart extends PureComponent<ChartProps, {}> {
   }
 
   renderSpinner(databaseName: string | undefined) {
-    const message = databaseName
-      ? t('Waiting on %s', databaseName)
-      : t('Waiting on database...');
+    const message = t(' ');
+    // databaseName
+    //   ? t('Waiting on %s', databaseName)
+    //   : t('Waiting on database...');
 
     return (
       <LoadingDiv>
