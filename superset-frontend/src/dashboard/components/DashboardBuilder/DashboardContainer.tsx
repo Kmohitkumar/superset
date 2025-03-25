@@ -295,7 +295,7 @@ const DashboardContainer: FC<DashboardContainerProps> = ({
         id={DASHBOARD_GRID_ID}
         activeKey={activeKey}
         renderTabBar={renderTabBar}
-        fullWidth
+        fullWidth={false}
         animated={false}
         allowOverflow
         onFocus={handleFocus}
