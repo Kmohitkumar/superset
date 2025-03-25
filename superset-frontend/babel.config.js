@@ -74,7 +74,8 @@ module.exports = {
             loose: true,
             shippedProposals: true,
             modules: 'auto',
-            targets: { node: 'current' },
+            targets: 'defaults',
+            // targets: { node: 'current' },
           },
         ],
         [

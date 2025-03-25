@@ -1,3 +1,5 @@
+/* eslint-disable theme-colors/no-literal-colors */
+/* eslint-disable prettier/prettier */
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +20,7 @@
  */
 // ParentSize uses resize observer so the dashboard will update size
 // when its container size changes, due to e.g., builder side panel opening
+import Icons from 'src/components/Icons';
 import {
   FC,
   memo,
@@ -62,12 +65,16 @@ import {
 } from 'src/dashboard/actions/dashboardState';
 import { CHART_TYPE } from 'src/dashboard/util/componentTypes';
 import { getColorNamespace, resetColors } from 'src/utils/colorScheme';
+// eslint-disable-next-line no-restricted-imports
+import { Modal } from 'antd';
 import { NATIVE_FILTER_DIVIDER_PREFIX } from '../nativeFilters/FiltersConfigModal/utils';
 import { findTabsWithChartsInScope } from '../nativeFilters/utils';
 import { getRootLevelTabsComponent } from './utils';
+import { getFilterBarTestId } from '../nativeFilters/FilterBar/utils';
 
 type DashboardContainerProps = {
   topLevelTabs?: LayoutItem;
+  onFilterButtonClick: () => void;
 };
 
 export const renderedChartIdsSelector = createSelector(
@@ -102,7 +109,10 @@ const useNativeFilterScopes = () => {
 
 const TOP_OF_PAGE_RANGE = 220;
 
-const DashboardContainer: FC<DashboardContainerProps> = ({ topLevelTabs }) => {
+const DashboardContainer: FC<DashboardContainerProps> = ({
+  topLevelTabs,
+  onFilterButtonClick,
+}) => {
   const nativeFilterScopes = useNativeFilterScopes();
   const dispatch = useDispatch();
 
@@ -285,30 +295,55 @@ const DashboardContainer: FC<DashboardContainerProps> = ({ topLevelTabs }) => {
         id={DASHBOARD_GRID_ID}
         activeKey={activeKey}
         renderTabBar={renderTabBar}
-        fullWidth={false}
+        fullWidth
         animated={false}
         allowOverflow
         onFocus={handleFocus}
+        tabBarExtraContent={
+          <Icons.FilterOutlined
+            {...getFilterBarTestId('filter-icon')}
+            iconSize="xl"
+            onClick={onFilterButtonClick}
+            css={{ cursor: 'pointer' }}
+          />
+        }
+       
       >
         {childIds.map((id, index) => (
           // Matching the key of the first TabPane irrespective of topLevelTabs
           // lets us keep the same React component tree when !!topLevelTabs changes.
           // This avoids expensive mounts/unmounts of the entire dashboard.
-          <Tabs.TabPane
-            key={index === 0 ? DASHBOARD_GRID_ID : index.toString()}
-          >
-            <DashboardGrid
-              gridComponent={dashboardLayout[id]}
-              // see isValidChild for why tabs do not increment the depth of their children
-              depth={DASHBOARD_ROOT_DEPTH + 1} // (topLevelTabs ? 0 : 1)}
-              width={width}
-              isComponentVisible={index === tabIndex}
+          <>
+            <Tabs.TabPane
+              key={index === 0 ? DASHBOARD_GRID_ID : index.toString()}
+            >
+              <DashboardGrid
+                gridComponent={dashboardLayout[id]}
+                // see isValidChild for why tabs do not increment the depth of their children
+                depth={DASHBOARD_ROOT_DEPTH + 1} // (topLevelTabs ? 0 : 1)}
+                width={width}
+                isComponentVisible={index === tabIndex}
+              />
+            </Tabs.TabPane>
+            <Icons.FilterOutlined
+              {...getFilterBarTestId('filter-icon')}
+              iconSize="xl"
+              onClick={onFilterButtonClick}
+              css={{ cursor: 'pointer', visibility: 'visible' }}
             />
-          </Tabs.TabPane>
+          </>
         ))}
       </Tabs>
     ),
-    [activeKey, childIds, dashboardLayout, handleFocus, renderTabBar, tabIndex],
+    [
+      activeKey,
+      childIds,
+      dashboardLayout,
+      handleFocus,
+      renderTabBar,
+      tabIndex,
+      onFilterButtonClick,
+    ],
   );
 
   return (

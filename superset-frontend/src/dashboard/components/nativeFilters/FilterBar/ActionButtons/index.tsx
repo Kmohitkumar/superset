@@ -59,24 +59,26 @@ const containerStyle = (theme: SupersetTheme) => css`
   }
 `;
 
+// eslint-disable-next-line theme-colors/no-literal-colors
 const verticalStyle = (theme: SupersetTheme, width: number) => css`
   flex-direction: column;
   align-items: center;
   pointer-events: none;
   position: fixed;
-  z-index: 100;
+  // z-index: 100;
 
   // filter bar width minus 1px for border
-  width: ${width - 1}px;
+  width: ${width}px;
   bottom: 0;
 
   padding: ${theme.gridUnit * 4}px;
-  padding-top: ${theme.gridUnit * 6}px;
+  // padding-top: ${theme.gridUnit * 6}px;
 
-  background: linear-gradient(
-    ${rgba(theme.colors.grayscale.light5, 0)},
-    ${theme.colors.grayscale.light5} ${theme.opacity.mediumLight}
-  );
+  // background: linear-gradient(
+  //   ${rgba(theme.colors.grayscale.light5, 0)},
+  //   ${theme.colors.grayscale.light5} ${theme.opacity.mediumLight}
+  // );
+  background: white;
 
   & > button {
     pointer-events: auto;

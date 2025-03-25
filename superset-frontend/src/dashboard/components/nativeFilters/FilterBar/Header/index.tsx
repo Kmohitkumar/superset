@@ -69,19 +69,14 @@ const Header: FC<HeaderProps> = ({ toggleFiltersBar }) => (
   <Wrapper>
     <TitleArea>
       <span>{t('Filters')}</span>
-      <FilterBarSettings />
+      {/* <FilterBarSettings /> */}
       <HeaderButton
         {...getFilterBarTestId('collapse-button')}
         buttonStyle="link"
         buttonSize="xsmall"
         onClick={() => toggleFiltersBar(false)}
       >
-        <Icons.VerticalAlignTopOutlined
-          iconSize="xl"
-          css={css`
-            transform: rotate(-90deg);
-          `}
-        />
+        <Icons.CloseCircleOutlined iconSize="xl" />
       </HeaderButton>
     </TitleArea>
   </Wrapper>

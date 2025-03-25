@@ -133,6 +133,7 @@ const FilterBar: FC<FiltersBarProps> = ({
   orientation = FilterBarOrientation.Vertical,
   verticalConfig,
   hidden = false,
+  onFilterApply,
 }) => {
   const history = useHistory();
   const dataMaskApplied: DataMaskStateWithId = useNativeFiltersDataMask();
@@ -243,6 +244,7 @@ const FilterBar: FC<FiltersBarProps> = ({
         dispatch(updateDataMask(filterId, dataMaskSelected[filterId]));
       }
     });
+    onFilterApply();
   }, [dataMaskSelected, dispatch]);
 
   const handleClearAll = useCallback(() => {

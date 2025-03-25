@@ -717,19 +717,24 @@ export function setDatasetsStatus(status) {
   };
 }
 
-const storeDashboardColorConfig = async (id, metadata) =>
-  SupersetClient.put({
-    endpoint: `/api/v1/dashboard/${id}/colors?mark_updated=false`,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      color_namespace: metadata.color_namespace,
-      color_scheme: metadata.color_scheme,
-      color_scheme_domain: metadata.color_scheme_domain || [],
-      shared_label_colors: metadata.shared_label_colors || [],
-      map_label_colors: metadata.map_label_colors || {},
-      label_colors: metadata.label_colors || {},
-    }),
-  });
+// const storeDashboardColorConfig = async (id, metadata) => {
+//   try {
+//     SupersetClient.put({
+//       endpoint: `/api/v1/dashboard/${id}/colors?mark_updated=false`,
+//       headers: { 'Content-Type': 'application/json' },
+//       body: JSON.stringify({
+//         color_namespace: metadata.color_namespace,
+//         color_scheme: metadata.color_scheme,
+//         color_scheme_domain: metadata.color_scheme_domain || [],
+//         shared_label_colors: metadata.shared_label_colors || [],
+//         map_label_colors: metadata.map_label_colors || {},
+//         label_colors: metadata.label_colors || {},
+//       }),
+//     });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
 /**
  *
@@ -740,14 +745,14 @@ const storeDashboardColorConfig = async (id, metadata) =>
  */
 export const persistDashboardLabelsColor = () => async (dispatch, getState) => {
   const {
-    dashboardInfo: { id, metadata },
+    // dashboardInfo: { id, metadata },
     dashboardState: { labelsColorMapMustSync, sharedLabelsColorsMustSync },
   } = getState();
 
   if (labelsColorMapMustSync || sharedLabelsColorsMustSync) {
     dispatch(setDashboardLabelsColorMapSynced());
     dispatch(setDashboardSharedLabelsColorsSynced());
-    storeDashboardColorConfig(id, metadata);
+    // storeDashboardColorConfig(id, metadata);
   }
 };
 

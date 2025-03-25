@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -75,10 +76,13 @@ import {
   EMPTY_CONTAINER_Z_INDEX,
 } from 'src/dashboard/constants';
 import BasicErrorAlert from 'src/components/ErrorMessage/BasicErrorAlert';
+// eslint-disable-next-line no-restricted-imports
+import { Modal } from 'antd';
 import { getRootLevelTabsComponent, shouldFocusTabs } from './utils';
 import DashboardContainer from './DashboardContainer';
 import { useNativeFilters } from './state';
 import DashboardWrapper from './DashboardWrapper';
+import { getFilterBarTestId } from '../nativeFilters/FilterBar/utils';
 
 // @z-index-above-dashboard-charts + 1 = 11
 const FiltersPanel = styled.div<{ width: number; hidden: boolean }>`
@@ -146,8 +150,8 @@ const DashboardContentWrapper = styled.div`
             theme.colors.grayscale.dark2,
             parseFloat(theme.opacity.light) / 100,
           )};
-        padding-left: ${theme.gridUnit *
-        2}px; /* note this is added to tab-level padding, to match header */
+        padding-left: ${theme.gridUnit * 2}px;
+        /* note this is added to tab-level padding, to match header */
       }
 
       .dropdown-toggle.btn.btn-primary .caret {
@@ -484,7 +488,7 @@ const DashboardBuilder = () => {
         !nativeFiltersEnabled ||
         filterBarOrientation === FilterBarOrientation.Horizontal
           ? 0
-          : -32,
+          : 0,
     }),
     [
       dashboardFiltersOpen,
@@ -581,8 +585,8 @@ const DashboardBuilder = () => {
         : CLOSED_FILTER_BAR_WIDTH;
       return (
         <FiltersPanel
-          width={filterBarWidth}
-          hidden={isReport}
+          width={300}
+          hidden={false}
           data-test="dashboard-filters-panel"
         >
           <StickyPanel ref={containerRef} width={filterBarWidth}>
@@ -590,11 +594,16 @@ const DashboardBuilder = () => {
               <FilterBar
                 orientation={FilterBarOrientation.Vertical}
                 verticalConfig={{
-                  filtersOpen: dashboardFiltersOpen,
+                  // filtersOpen: dashboardFiltersOpen,
+                  // toggleFiltersBar: toggleDashboardFiltersOpen,
+                  // width: filterBarWidth,
+                  // height: filterBarHeight,
+                  // offset: filterBarOffset,
+                  filtersOpen: true,
                   toggleFiltersBar: toggleDashboardFiltersOpen,
-                  width: filterBarWidth,
-                  height: filterBarHeight,
-                  offset: filterBarOffset,
+                  width: 300,
+                  height: 500,
+                  offset: 0,
                 }}
               />
             </ErrorBoundary>
@@ -602,13 +611,7 @@ const DashboardBuilder = () => {
         </FiltersPanel>
       );
     },
-    [
-      dashboardFiltersOpen,
-      toggleDashboardFiltersOpen,
-      filterBarHeight,
-      filterBarOffset,
-      isReport,
-    ],
+    [dashboardFiltersOpen, containerRef, toggleDashboardFiltersOpen],
   );
 
   return (
@@ -616,7 +619,7 @@ const DashboardBuilder = () => {
       {showFilterBar &&
         filterBarOrientation === FilterBarOrientation.Vertical && (
           <>
-            <ResizableSidebar
+            {/* <ResizableSidebar
               id={`dashboard:${dashboardId}`}
               enable={dashboardFiltersOpen}
               minWidth={OPEN_FILTER_BAR_WIDTH}
@@ -624,7 +627,7 @@ const DashboardBuilder = () => {
               initialWidth={OPEN_FILTER_BAR_WIDTH}
             >
               {renderChild}
-            </ResizableSidebar>
+            </ResizableSidebar> */}
           </>
         )}
       <StyledHeader ref={headerRef}>
@@ -674,7 +677,8 @@ const DashboardBuilder = () => {
           <StyledDashboardContent
             className="dashboard-content"
             editMode={editMode}
-            marginLeft={dashboardContentMarginLeft}
+            // marginLeft={dashboardContentMarginLeft}
+            marginLeft={20}
           >
             {showDashboard ? (
               missingInitialFilters.length > 0 ? (
@@ -701,7 +705,45 @@ const DashboardBuilder = () => {
                   />
                 </div>
               ) : (
-                <DashboardContainer topLevelTabs={topLevelTabs} />
+                <>
+                  <DashboardContainer
+                    topLevelTabs={topLevelTabs}
+                    onFilterButtonClick={toggleDashboardFiltersOpen}
+                  />
+                  <Modal
+                    visible={dashboardFiltersOpen}
+                    footer={null}
+                    width={420}
+                    closable={false}
+                    maskClosable={false}
+                    bodyStyle={{padding: 0}}
+                  >
+                    <div style={{}}>
+                      <FiltersPanel
+                        width={400}
+                        hidden={false}
+                        data-test="dashboard-filters-panel"
+                      >
+                        <StickyPanel ref={containerRef} width={400}>
+                          <ErrorBoundary>
+                            <FilterBar
+                              orientation={FilterBarOrientation.Vertical}
+                              verticalConfig={{
+                                filtersOpen: true,
+                                toggleFiltersBar: toggleDashboardFiltersOpen,
+                                width: 400,
+                                height: 500,
+                                offset: 0,
+                              }}
+                              onFilterApply={()=> {toggleDashboardFiltersOpen();
+                              }}
+                            />
+                          </ErrorBoundary>
+                        </StickyPanel>
+                      </FiltersPanel>
+                    </div>
+                  </Modal>
+                </>
               )
             ) : (
               <Loading />

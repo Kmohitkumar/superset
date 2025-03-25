@@ -50,6 +50,7 @@ export interface FiltersBarProps {
   hidden?: boolean;
   orientation: FilterBarOrientation;
   verticalConfig?: VerticalBarConfig;
+  onFilterApply?: any;
 }
 
 export type HorizontalBarProps = CommonFiltersBarProps & {
