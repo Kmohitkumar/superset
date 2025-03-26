@@ -126,8 +126,6 @@ const FilterControls: FC<FilterControlsProps> = ({
       const filterIndex = filtersWithValues.findIndex(f => f.id === id);
       const key = index ?? id;
       return (
-        // Empty text node is to ensure there's always an element preceding
-        // the OutPortal, otherwise react-reverse-portal crashes
         <Fragment key={key}>
           {'' /* eslint-disable-line react/jsx-curly-brace-presence */}
           <OutPortal node={portalNodes[filterIndex]} inView />

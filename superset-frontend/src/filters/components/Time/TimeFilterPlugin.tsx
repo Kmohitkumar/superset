@@ -18,7 +18,7 @@
  */
 import { styled, NO_TIME_RANGE } from '@superset-ui/core';
 import { useCallback, useEffect } from 'react';
-import DateFilterControl from 'src/explore/components/controls/DateFilterControl';
+import DateFilterControl from 'src/explore/components/controls/DateFilterControl/DateFilterLabel';
 import { PluginFilterTimeProps } from './types';
 import { FilterPluginStyle } from '../common';
 

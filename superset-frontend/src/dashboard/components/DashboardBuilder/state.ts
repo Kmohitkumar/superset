@@ -37,8 +37,7 @@ export const useNativeFilters = () => {
   const filterValues = useMemo(() => Object.values(filters), [filters]);
   const expandFilters = getUrlParam(URL_PARAMS.expandFilters);
   const [dashboardFiltersOpen, setDashboardFiltersOpen] = useState(
-    // expandFilters ?? !!filterValues.length,
-    false,
+    expandFilters ?? !!filterValues.length,
   );
 
   const nativeFiltersEnabled =
@@ -67,16 +66,16 @@ export const useNativeFilters = () => {
     setDashboardFiltersOpen(prevState => visible ?? !prevState);
   }, []);
 
-  // useEffect(() => {
-  //   if (
-  //     expandFilters === false ||
-  //     (filterValues.length === 0 && nativeFiltersEnabled)
-  //   ) {
-  //     toggleDashboardFiltersOpen(false);
-  //   } else {
-  //     toggleDashboardFiltersOpen(true);
-  //   }
-  // }, [filterValues.length]);
+  useEffect(() => {
+    if (
+      expandFilters === false ||
+      (filterValues.length === 0 && nativeFiltersEnabled)
+    ) {
+      toggleDashboardFiltersOpen(false);
+    } else {
+      toggleDashboardFiltersOpen(true);
+    }
+  }, [filterValues.length]);
 
   useEffect(() => {
     if (showDashboard) {

@@ -133,7 +133,6 @@ const FilterBar: FC<FiltersBarProps> = ({
   orientation = FilterBarOrientation.Vertical,
   verticalConfig,
   hidden = false,
-  onFilterApply,
 }) => {
   const history = useHistory();
   const dataMaskApplied: DataMaskStateWithId = useNativeFiltersDataMask();
@@ -171,21 +170,13 @@ const FilterBar: FC<FiltersBarProps> = ({
       dataMask: Partial<DataMask>,
     ) => {
       setDataMaskSelected(draft => {
-        // force instant updating on initialization for filters with `requiredFirst` is true or instant filters
-        if (
-          // filterState.value === undefined - means that value not initialized
-          dataMask.filterState?.value !== undefined &&
-          dataMaskSelectedRef.current[filter.id]?.filterState?.value ===
-            undefined &&
-          filter.requiredFirst
-        ) {
-          dispatch(updateDataMask(filter.id, dataMask));
-        }
         draft[filter.id] = {
           ...(getInitialDataMask(filter.id) as DataMaskWithId),
           ...dataMask,
         };
       });
+      // Auto-apply the filter change
+      dispatch(updateDataMask(filter.id, dataMask));
     },
     [dispatch, setDataMaskSelected],
   );
@@ -235,85 +226,22 @@ const FilterBar: FC<FiltersBarProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dashboardId, dataMaskAppliedText, history, updateKey, tabId]);
 
-  const handleApply = useCallback(() => {
-    dispatch(logEvent(LOG_ACTIONS_CHANGE_DASHBOARD_FILTER, {}));
-    const filterIds = Object.keys(dataMaskSelected);
-    setUpdateKey(1);
-    filterIds.forEach(filterId => {
-      if (dataMaskSelected[filterId]) {
-        dispatch(updateDataMask(filterId, dataMaskSelected[filterId]));
-      }
-    });
-    onFilterApply();
-  }, [dataMaskSelected, dispatch]);
-
-  const handleClearAll = useCallback(() => {
-    const clearDataMaskIds: string[] = [];
-    let dispatchAllowed = false;
-    filtersInScope.filter(isNativeFilter).forEach(filter => {
-      const { id } = filter;
-      if (dataMaskSelected[id]) {
-        if (filter.controlValues?.enableEmptyFilter) {
-          dispatchAllowed = false;
-        }
-        clearDataMaskIds.push(id);
-        setDataMaskSelected(draft => {
-          if (draft[id].filterState?.value !== undefined) {
-            draft[id].filterState!.value = undefined;
-          }
-        });
-      }
-    });
-    if (dispatchAllowed) {
-      clearDataMaskIds.forEach(id => dispatch(clearDataMask(id)));
-    }
-  }, [dataMaskSelected, dispatch, filtersInScope, setDataMaskSelected]);
-
   useFilterUpdates(dataMaskSelected, setDataMaskSelected);
-  const isApplyDisabled = checkIsApplyDisabled(
-    dataMaskSelected,
-    dataMaskApplied,
-    filtersInScope.filter(isNativeFilter),
-  );
   const isInitialized = useInitialization();
-
-  const actions = useMemo(
-    () => (
-      <ActionButtons
-        filterBarOrientation={orientation}
-        width={verticalConfig?.width}
-        onApply={handleApply}
-        onClearAll={handleClearAll}
-        dataMaskSelected={dataMaskSelected}
-        dataMaskApplied={dataMaskApplied}
-        isApplyDisabled={isApplyDisabled}
-      />
-    ),
-    [
-      orientation,
-      verticalConfig?.width,
-      handleApply,
-      handleClearAll,
-      dataMaskSelected,
-      dataMaskAppliedText,
-      isApplyDisabled,
-    ],
-  );
 
   const filterBarComponent =
     orientation === FilterBarOrientation.Horizontal ? (
       <Horizontal
-        actions={actions}
         canEdit={canEdit}
         dashboardId={dashboardId}
         dataMaskSelected={dataMaskSelected}
         filterValues={filterValues}
         isInitialized={isInitialized}
         onSelectionChange={handleFilterSelectionChange}
+        actions={null}
       />
     ) : verticalConfig ? (
       <Vertical
-        actions={actions}
         canEdit={canEdit}
         dataMaskSelected={dataMaskSelected}
         filtersOpen={verticalConfig.filtersOpen}
@@ -324,6 +252,7 @@ const FilterBar: FC<FiltersBarProps> = ({
         onSelectionChange={handleFilterSelectionChange}
         toggleFiltersBar={verticalConfig.toggleFiltersBar}
         width={verticalConfig.width}
+        actions={null}
       />
     ) : null;
 

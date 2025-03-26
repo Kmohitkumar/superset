@@ -126,6 +126,7 @@ export default function PluginFilterTimegrain(
           allowClear
           value={value}
           placeholder={placeholderText}
+          getPopupContainer={() => document.body}
           // @ts-ignore
           onChange={handleChange}
           onBlur={unsetFocusedFilter}

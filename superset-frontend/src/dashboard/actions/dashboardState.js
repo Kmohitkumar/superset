@@ -274,6 +274,16 @@ export function saveDashboardRequest(data, id, saveType) {
 
     const { dashboardFilters, dashboardLayout } = getState();
     const layout = dashboardLayout.present;
+
+    // Add logging for debugging
+    console.log('Dashboard Save Request Data:', {
+      id,
+      saveType,
+      data,
+      layoutSize: safeStringify(layout).length,
+      filters: Object.keys(dashboardFilters).length,
+    });
+
     Object.values(dashboardFilters).forEach(filter => {
       const { chartId } = filter;
       const componentId = filter.directPathToFilter.slice().pop();
@@ -299,9 +309,6 @@ export function saveDashboardRequest(data, id, saveType) {
     const metadataCrossFiltersEnabled = data.metadata?.cross_filters_enabled;
     const colorScheme = data.metadata?.color_scheme;
     const customLabelsColor = data.metadata?.label_colors || {};
-    const sharedLabelsColor = enforceSharedLabelsColorsArray(
-      data.metadata?.shared_label_colors,
-    );
     const cleanedData = {
       ...data,
       certified_by: certified_by || '',
@@ -323,8 +330,6 @@ export function saveDashboardRequest(data, id, saveType) {
           : [],
         expanded_slices: data.metadata?.expanded_slices || {},
         label_colors: customLabelsColor,
-        shared_label_colors: getFreshSharedLabels(sharedLabelsColor),
-        map_label_colors: getFreshLabelsColorMapEntries(customLabelsColor),
         refresh_frequency: data.metadata?.refresh_frequency || 0,
         timed_refresh_immune_slices:
           data.metadata?.timed_refresh_immune_slices || [],
@@ -417,6 +422,15 @@ export function saveDashboardRequest(data, id, saveType) {
       const { error, message } = await getClientErrorObject(response);
       let errorText = t('Sorry, an unknown error occurred');
 
+      // Add detailed error logging
+      console.error('Dashboard Save Error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error,
+        message,
+        response: await response.text(),
+      });
+
       if (error) {
         errorText = t(
           'Sorry, there was an error saving this dashboard: %s',
@@ -435,6 +449,33 @@ export function saveDashboardRequest(data, id, saveType) {
     ) {
       const { chartConfiguration, globalChartConfiguration } =
         handleChartConfiguration();
+
+      // Create a clean metadata object without problematic fields
+      const cleanMetadata = {
+        ...(cleanedData?.metadata || {}),
+        default_filters: safeStringify(serializedFilters),
+        filter_scopes: serializedFilterScopes,
+        chart_configuration: chartConfiguration,
+        global_chart_configuration: globalChartConfiguration,
+        color_scheme: colorScheme || '',
+        color_namespace: getColorNamespace(data.metadata?.color_namespace),
+        color_scheme_domain: colorScheme
+          ? getColorSchemeDomain(colorScheme)
+          : [],
+        label_colors: customLabelsColor,
+        refresh_frequency: data.metadata?.refresh_frequency || 0,
+        timed_refresh_immune_slices:
+          data.metadata?.timed_refresh_immune_slices || [],
+        cross_filters_enabled: isCrossFiltersEnabled(
+          metadataCrossFiltersEnabled,
+        ),
+        expanded_slices: data.metadata?.expanded_slices || {},
+      };
+
+      // Remove problematic fields that are causing validation errors
+      delete cleanMetadata.map_label_colors;
+      delete cleanMetadata.shared_label_colors;
+
       const updatedDashboard =
         saveType === SAVE_TYPE_OVERWRITE_CONFIRMED
           ? data
@@ -446,14 +487,15 @@ export function saveDashboardRequest(data, id, saveType) {
               slug: cleanedData.slug,
               owners: cleanedData.owners,
               roles: cleanedData.roles,
-              json_metadata: safeStringify({
-                ...(cleanedData?.metadata || {}),
-                default_filters: safeStringify(serializedFilters),
-                filter_scopes: serializedFilterScopes,
-                chart_configuration: chartConfiguration,
-                global_chart_configuration: globalChartConfiguration,
-              }),
+              json_metadata: safeStringify(cleanMetadata),
             };
+
+      // Add logging for the final request payload
+      console.log('Dashboard Save Request Payload:', {
+        endpoint: `/api/v1/dashboard/${id}`,
+        payload: updatedDashboard,
+        payloadSize: JSON.stringify(updatedDashboard).length,
+      });
 
       const updateDashboard = () =>
         SupersetClient.put({
@@ -462,7 +504,9 @@ export function saveDashboardRequest(data, id, saveType) {
           body: JSON.stringify(updatedDashboard),
         })
           .then(response => onUpdateSuccess(response))
-          .catch(response => onError(response));
+          .catch(response => {
+            onError(response);
+          });
       return new Promise((resolve, reject) => {
         if (
           !isFeatureEnabled(FeatureFlag.ConfirmDashboardDiff) ||
@@ -716,25 +760,6 @@ export function setDatasetsStatus(status) {
     status,
   };
 }
-
-// const storeDashboardColorConfig = async (id, metadata) => {
-//   try {
-//     SupersetClient.put({
-//       endpoint: `/api/v1/dashboard/${id}/colors?mark_updated=false`,
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify({
-//         color_namespace: metadata.color_namespace,
-//         color_scheme: metadata.color_scheme,
-//         color_scheme_domain: metadata.color_scheme_domain || [],
-//         shared_label_colors: metadata.shared_label_colors || [],
-//         map_label_colors: metadata.map_label_colors || {},
-//         label_colors: metadata.label_colors || {},
-//       }),
-//     });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
 
 /**
  *

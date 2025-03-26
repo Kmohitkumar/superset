@@ -80,7 +80,7 @@ export const FiltersOutOfScopeCollapsible = ({
           `
     }
   >
-    <AntdCollapse.Panel
+    {/* <AntdCollapse.Panel
       forceRender={forceRender}
       header={
         <span
@@ -94,6 +94,6 @@ export const FiltersOutOfScopeCollapsible = ({
       key="1"
     >
       {filtersOutOfScope.map(renderer)}
-    </AntdCollapse.Panel>
+    </AntdCollapse.Panel> */}
   </AntdCollapse>
 );

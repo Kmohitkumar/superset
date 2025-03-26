@@ -20,7 +20,6 @@
  */
 // ParentSize uses resize observer so the dashboard will update size
 // when its container size changes, due to e.g., builder side panel opening
-import Icons from 'src/components/Icons';
 import {
   FC,
   memo,
@@ -295,19 +294,10 @@ const DashboardContainer: FC<DashboardContainerProps> = ({
         id={DASHBOARD_GRID_ID}
         activeKey={activeKey}
         renderTabBar={renderTabBar}
-        fullWidth={false}
+        fullWidth
         animated={false}
         allowOverflow
         onFocus={handleFocus}
-        tabBarExtraContent={
-          <Icons.FilterOutlined
-            {...getFilterBarTestId('filter-icon')}
-            iconSize="xl"
-            onClick={onFilterButtonClick}
-            css={{ cursor: 'pointer' }}
-          />
-        }
-       
       >
         {childIds.map((id, index) => (
           // Matching the key of the first TabPane irrespective of topLevelTabs
@@ -325,12 +315,6 @@ const DashboardContainer: FC<DashboardContainerProps> = ({
                 isComponentVisible={index === tabIndex}
               />
             </Tabs.TabPane>
-            <Icons.FilterOutlined
-              {...getFilterBarTestId('filter-icon')}
-              iconSize="xl"
-              onClick={onFilterButtonClick}
-              css={{ cursor: 'pointer', visibility: 'visible' }}
-            />
           </>
         ))}
       </Tabs>

@@ -523,13 +523,6 @@ const DashboardBuilder = () => {
     ({ dropIndicatorProps }: { dropIndicatorProps: JsonObject }) => (
       <div>
         {!hideDashboardHeader && <DashboardHeader />}
-        {showFilterBar &&
-          filterBarOrientation === FilterBarOrientation.Horizontal && (
-            <FilterBar
-              orientation={FilterBarOrientation.Horizontal}
-              hidden={isReport}
-            />
-          )}
         {dropIndicatorProps && <div {...dropIndicatorProps} />}
         {!isReport && topLevelTabs && !uiConfig.hideNav && (
           <WithPopoverMenu
@@ -585,25 +578,20 @@ const DashboardBuilder = () => {
         : CLOSED_FILTER_BAR_WIDTH;
       return (
         <FiltersPanel
-          width={300}
+          width={0}
           hidden={false}
           data-test="dashboard-filters-panel"
         >
-          <StickyPanel ref={containerRef} width={filterBarWidth}>
+          <StickyPanel ref={containerRef} width={1500}>
             <ErrorBoundary>
               <FilterBar
-                orientation={FilterBarOrientation.Vertical}
+                orientation={FilterBarOrientation.Horizontal}
                 verticalConfig={{
-                  // filtersOpen: dashboardFiltersOpen,
-                  // toggleFiltersBar: toggleDashboardFiltersOpen,
-                  // width: filterBarWidth,
-                  // height: filterBarHeight,
-                  // offset: filterBarOffset,
-                  filtersOpen: true,
+                  filtersOpen: dashboardFiltersOpen,
                   toggleFiltersBar: toggleDashboardFiltersOpen,
-                  width: 300,
-                  height: 500,
-                  offset: 0,
+                  width: 2000,
+                  height: 200,
+                  offset: 100,
                 }}
               />
             </ErrorBoundary>
@@ -616,142 +604,128 @@ const DashboardBuilder = () => {
 
   return (
     <DashboardWrapper>
-      {showFilterBar &&
-        filterBarOrientation === FilterBarOrientation.Vertical && (
-          <>
-            {/* <ResizableSidebar
-              id={`dashboard:${dashboardId}`}
-              enable={dashboardFiltersOpen}
-              minWidth={OPEN_FILTER_BAR_WIDTH}
-              maxWidth={OPEN_FILTER_BAR_MAX_WIDTH}
-              initialWidth={OPEN_FILTER_BAR_WIDTH}
-            >
-              {renderChild}
-            </ResizableSidebar> */}
-          </>
-        )}
-      <StyledHeader ref={headerRef}>
-        {/* @ts-ignore */}
-        <Droppable
-          data-test="top-level-tabs"
-          className={cx(!topLevelTabs && editMode && 'empty-droptarget')}
-          component={dashboardRoot}
-          parentComponent={null}
-          depth={DASHBOARD_ROOT_DEPTH}
-          index={0}
-          orientation="column"
-          onDrop={handleDrop}
-          editMode={editMode}
-          // you cannot drop on/displace tabs if they already exist
-          disableDragDrop={!!topLevelTabs}
-          style={draggableStyle}
-        >
-          {renderDraggableContent}
-        </Droppable>
-      </StyledHeader>
-      <StyledContent fullSizeChartId={fullSizeChartId}>
-        {!editMode &&
-          !topLevelTabs &&
-          dashboardLayout[DASHBOARD_GRID_ID]?.children?.length === 0 && (
-            <EmptyState
-              title={t('There are no charts added to this dashboard')}
-              size="large"
-              description={
-                canEdit &&
-                t(
-                  'Go to the edit mode to configure the dashboard and add charts',
-                )
-              }
-              buttonText={canEdit && t('Edit the dashboard')}
-              buttonAction={() => {
-                dispatch(setEditMode(true));
-                dispatch(clearDashboardHistory());
-              }}
-              image="dashboard.svg"
-            />
-          )}
-        <DashboardContentWrapper
-          data-test="dashboard-content-wrapper"
-          className={cx('dashboard', editMode && 'dashboard--editing')}
-        >
-          <StyledDashboardContent
-            className="dashboard-content"
+      <div css={css`
+        display: flex;
+        flex-direction: column;
+        width: 100vw;
+        max-width: 100%;
+      `}>
+        <StyledHeader ref={headerRef}>
+          {/* @ts-ignore */}
+          <Droppable
+            data-test="top-level-tabs"
+            className={cx(!topLevelTabs && editMode && 'empty-droptarget')}
+            component={dashboardRoot}
+            parentComponent={null}
+            depth={DASHBOARD_ROOT_DEPTH}
+            index={0}
+            orientation="column"
+            onDrop={handleDrop}
             editMode={editMode}
-            // marginLeft={dashboardContentMarginLeft}
-            marginLeft={20}
+            // you cannot drop on/displace tabs if they already exist
+            disableDragDrop={!!topLevelTabs}
+            style={draggableStyle}
           >
-            {showDashboard ? (
-              missingInitialFilters.length > 0 ? (
-                <div
-                  css={css`
-                    display: flex;
-                    flex-direction: row;
-                    align-items: center;
-                    justify-content: center;
-                    flex: 1;
-                    & div {
-                      width: 500px;
-                    }
-                  `}
-                >
-                  <BasicErrorAlert
-                    title={t('Unable to load dashboard')}
-                    body={t(
-                      `The following filters have the 'Select first filter value by default'
-                    option checked and could not be loaded, which is preventing the dashboard
-                    from rendering: %s`,
-                      missingInitialFilters.join(', '),
-                    )}
-                  />
-                </div>
-              ) : (
-                <>
+            {renderDraggableContent}
+          </Droppable>
+        </StyledHeader>
+        {showFilterBar && (
+          <div css={css`
+            padding: ${theme.gridUnit * 2}px ${theme.gridUnit * 4}px;
+            background-color: ${theme.colors.grayscale.light5};
+            border-bottom: 1px solid ${theme.colors.grayscale.light2};
+            width: 100%;
+          `}>
+            <FilterBar
+              orientation={FilterBarOrientation.Horizontal}
+              hidden={isReport}
+            />
+          </div>
+        )}
+        <StyledContent fullSizeChartId={fullSizeChartId} css={css`
+          width: 100%;
+          max-width: 100%;
+        `}>
+          {!editMode &&
+            !topLevelTabs &&
+            dashboardLayout[DASHBOARD_GRID_ID]?.children?.length === 0 && (
+              <EmptyState
+                title={t('There are no charts added to this dashboard')}
+                size="large"
+                description={
+                  canEdit &&
+                  t(
+                    'Go to the edit mode to configure the dashboard and add charts',
+                  )
+                }
+                buttonText={canEdit && t('Edit the dashboard')}
+                buttonAction={() => {
+                  dispatch(setEditMode(true));
+                  dispatch(clearDashboardHistory());
+                }}
+                image="dashboard.svg"
+              />
+            )}
+          <DashboardContentWrapper
+            data-test="dashboard-content-wrapper"
+            className={cx('dashboard', editMode && 'dashboard--editing')}
+            css={css`
+              width: 100%;
+              max-width: 100%;
+            `}
+          >
+            <StyledDashboardContent
+              className="dashboard-content"
+              editMode={editMode}
+              marginLeft={20}
+              css={css`
+                width: 100%;
+                max-width: 100%;
+              `}
+            >
+              {showDashboard ? (
+                missingInitialFilters.length > 0 ? (
+                  <div
+                    css={css`
+                      display: flex;
+                      flex-direction: row;
+                      align-items: center;
+                      justify-content: center;
+                      flex: 1;
+                      width: 100%;
+                      & div {
+                        width: 500px;
+                      }
+                    `}
+                  >
+                    <BasicErrorAlert
+                      title={t('Unable to load dashboard')}
+                      body={t(
+                        `The following filters have the 'Select first filter value by default'
+                      option checked and could not be loaded, which is preventing the dashboard
+                      from rendering: %s`,
+                        missingInitialFilters.join(', '),
+                      )}
+                    />
+                  </div>
+                ) : (
                   <DashboardContainer
                     topLevelTabs={topLevelTabs}
                     onFilterButtonClick={toggleDashboardFiltersOpen}
+                    css={css`
+                      width: 100%;
+                      max-width: 100%;
+                    `}
                   />
-                  <Modal
-                    visible={dashboardFiltersOpen}
-                    footer={null}
-                    width={420}
-                    closable={false}
-                    maskClosable={false}
-                    bodyStyle={{padding: 0}}
-                  >
-                    <div style={{}}>
-                      <FiltersPanel
-                        width={400}
-                        hidden={false}
-                        data-test="dashboard-filters-panel"
-                      >
-                        <StickyPanel ref={containerRef} width={400}>
-                          <ErrorBoundary>
-                            <FilterBar
-                              orientation={FilterBarOrientation.Vertical}
-                              verticalConfig={{
-                                filtersOpen: true,
-                                toggleFiltersBar: toggleDashboardFiltersOpen,
-                                width: 400,
-                                height: 500,
-                                offset: 0,
-                              }}
-                              onFilterApply={()=> {toggleDashboardFiltersOpen();
-                              }}
-                            />
-                          </ErrorBoundary>
-                        </StickyPanel>
-                      </FiltersPanel>
-                    </div>
-                  </Modal>
-                </>
-              )
-            ) : (
-              <Loading />
-            )}
-            {editMode && <BuilderComponentPane topOffset={barTopOffset} />}
-          </StyledDashboardContent>
-        </DashboardContentWrapper>
-      </StyledContent>
+                )
+              ) : (
+                <Loading />
+              )}
+              {editMode && <BuilderComponentPane topOffset={barTopOffset} />}
+            </StyledDashboardContent>
+          </DashboardContentWrapper>
+        </StyledContent>
+      </div>
       {dashboardIsSaving && (
         <Loading
           css={css`

@@ -37,12 +37,15 @@ const StyledTabs = ({
     {...props}
     css={theme => css`
       overflow: ${allowOverflow ? 'visible' : 'hidden'};
+      margin-top: -${theme.gridUnit * 2}px;
 
       .ant-tabs-content-holder {
         overflow: ${allowOverflow ? 'visible' : 'auto'};
       }
       .ant-tabs-tab {
-        flex: 1 1 auto;
+        padding: ${theme.gridUnit * 2}px ${theme.gridUnit * 2}px
+          ${theme.gridUnit}px;
+        // flex: 1 1 auto;
         &.ant-tabs-tab-active .ant-tabs-tab-btn {
           color: inherit;
         }

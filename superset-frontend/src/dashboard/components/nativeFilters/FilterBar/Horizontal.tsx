@@ -32,11 +32,12 @@ import crossFiltersSelector from './CrossFilters/selectors';
 
 const HorizontalBar = styled.div`
   ${({ theme }) => `
-    padding: ${theme.gridUnit * 3}px ${theme.gridUnit * 2}px ${
-      theme.gridUnit * 3
+    padding: ${theme.gridUnit}px ${theme.gridUnit * 2}px ${
+      theme.gridUnit
     }px ${theme.gridUnit * 4}px;
     background: ${theme.colors.grayscale.light5};
     box-shadow: inset 0px -2px 2px -1px ${theme.colors.grayscale.light2};
+    width: 100%;
   `}
 `;
 
@@ -48,6 +49,11 @@ const HorizontalBarContent = styled.div`
     align-items: center;
     justify-content: flex-start;
     line-height: 0;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 ${theme.gridUnit * 2}px;
+    gap: ${theme.gridUnit * 4}px;
+    overflow-x: auto;
 
     .loading {
       margin: ${theme.gridUnit * 2}px auto ${theme.gridUnit * 2}px;
@@ -65,8 +71,31 @@ const FilterBarEmptyStateContainer = styled.div`
   `}
 `;
 
+const FilterControlsWrapper = styled.div`
+  ${({ theme }) => `
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    gap: ${theme.gridUnit * 4}px;
+    overflow-x: auto;
+
+    .filter-item-wrapper {
+      flex: 1;
+      min-width: 0;
+      width: calc(
+        (100% - ${theme.gridUnit * 4}px * (var(--filter-count) - 1)) /
+          var(--filter-count)
+      );
+    }
+  `}
+`;
+
 const HorizontalFilterBar: FC<HorizontalBarProps> = ({
-  actions,
   dataMaskSelected,
   filterValues,
   isInitialized,
@@ -99,19 +128,20 @@ const HorizontalFilterBar: FC<HorizontalBarProps> = ({
           <Loading position="inline-centered" />
         ) : (
           <>
-            <FilterBarSettings />
+            {hasFilters && <FilterBarSettings />}
             {!hasFilters && (
               <FilterBarEmptyStateContainer data-test="horizontal-filterbar-empty">
                 {t('No filters are currently added to this dashboard.')}
               </FilterBarEmptyStateContainer>
             )}
             {hasFilters && (
-              <FilterControls
-                dataMaskSelected={dataMaskSelected}
-                onFilterSelectionChange={onSelectionChange}
-              />
+              <FilterControlsWrapper>
+                <FilterControls
+                  dataMaskSelected={dataMaskSelected}
+                  onFilterSelectionChange={onSelectionChange}
+                />
+              </FilterControlsWrapper>
             )}
-            {actions}
           </>
         )}
       </HorizontalBarContent>

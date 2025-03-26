@@ -46,6 +46,7 @@ export const StyledSelect = styled(AntdSelect, {
 })<{ headerPosition?: string; oneLine?: boolean }>`
   ${({ theme, headerPosition, oneLine }) => `
     flex: ${headerPosition === 'left' ? 1 : 0};
+    min-width: ${theme.gridUnit * 38}px;
     && .ant-select-selector {
       border-radius: ${theme.gridUnit}px;
     }
