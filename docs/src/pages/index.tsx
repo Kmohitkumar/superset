@@ -461,14 +461,14 @@ export default function Home(): JSX.Element {
     const navbar = document.body.querySelector('.navbar');
     const logo = document.body.querySelector('.navbar__logo img');
     navbar.classList.add('navbar--dark');
-    logo.setAttribute('src', '/img/superset-logo-horiz-dark.svg');
+    // logo.setAttribute('src', '/img/superset-logo-horiz-dark.svg');
   };
 
   const changeToLight = () => {
     const navbar = document.body.querySelector('.navbar');
     const logo = document.body.querySelector('.navbar__logo img');
     navbar.classList.remove('navbar--dark');
-    logo.setAttribute('src', '/img/superset-logo-horiz.svg');
+    // logo.setAttribute('src', '/img/superset-logo-horiz.svg');
   };
 
   // Set up dark <-> light navbar change

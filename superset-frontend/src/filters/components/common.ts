@@ -22,14 +22,46 @@ import FormItem from '../../components/Form/FormItem';
 
 export const RESPONSIVE_WIDTH = 0;
 
+// eslint-disable-next-line theme-colors/no-literal-colors
 export const FilterPluginStyle = styled.div<PluginFilterStylesProps>`
   min-height: ${({ height }) => height}px;
   width: ${({ width }) => (width === RESPONSIVE_WIDTH ? '100%' : `${width}px`)};
+  margin: ${({ theme }) => theme.gridUnit}px;
+`;
+
+export const FilterContainer = styled.div`
+  align-items: center;
+  width: 100%;
+  background-color: ${({ theme }) => theme.colors.grayscale.light5};
+  border-radius: ${({ theme }) => theme.borderRadius}px;
+  padding: ${({ theme }) => theme.gridUnit}px;
 `;
 
 export const StyledFormItem = styled(FormItem)`
   &.ant-row.ant-form-item {
     margin: 0;
+    width: 100%;
+
+    .ant-form-item-label {
+      text-align: center;
+      width: 100%;
+      margin-bottom: 0;
+      padding: 0;
+
+      > label {
+        color: ${({ theme }) => theme.colors.grayscale.base};
+        font-size: ${({ theme }) => theme.typography.sizes.s}px;
+        margin: 0;
+        padding: 0;
+        line-height: 1;
+      }
+    }
+
+    .ant-form-item-control {
+      width: 100%;
+      margin-top: 0;
+      padding-top: 0;
+    }
   }
 `;
 

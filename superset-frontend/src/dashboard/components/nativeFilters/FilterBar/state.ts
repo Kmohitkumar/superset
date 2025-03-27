@@ -24,6 +24,7 @@ import {
   DataMaskWithId,
   Filter,
   Filters,
+  NO_TIME_RANGE,
 } from '@superset-ui/core';
 import { useEffect, useMemo, useState } from 'react';
 import { ChartsState, RootState } from 'src/dashboard/types';
@@ -94,6 +95,7 @@ export const useInitialization = () => {
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const filters = useFilters();
   const charts = useSelector<RootState, ChartsState>(state => state.charts);
+  const dataMask = useNativeFiltersDataMask();
 
   // We need to know how much charts now shown on dashboard to know how many of all charts should be loaded
   let numberOfLoadingCharts = 0;
@@ -102,12 +104,22 @@ export const useInitialization = () => {
       '[data-ui-anchor="chart"]',
     ).length;
   }
+
   useEffect(() => {
     if (isInitialized) {
       return;
     }
 
-    if (Object.values(filters).find(({ requiredFirst }) => requiredFirst)) {
+    // Check if any required filters have values set
+    const hasRequiredFiltersWithValues = Object.values(filters).some(
+      ({ requiredFirst, id }) => {
+        if (!requiredFirst) return false;
+        const filterValue = dataMask[id]?.filterState?.value;
+        return filterValue !== undefined && filterValue !== NO_TIME_RANGE;
+      },
+    );
+
+    if (hasRequiredFiltersWithValues) {
       setIsInitialized(true);
       return;
     }
@@ -135,7 +147,7 @@ export const useInitialization = () => {
     ) {
       setIsInitialized(true);
     }
-  }, [charts, isInitialized, numberOfLoadingCharts]);
+  }, [charts, isInitialized, numberOfLoadingCharts, filters, dataMask]);
 
   return isInitialized;
 };

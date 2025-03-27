@@ -612,10 +612,36 @@ const FiltersConfigForm = (
     sort = formFilter.controlValues.sortAscending;
   }
 
+  const initialDefaultValue =
+    formFilter?.filterType === filterToEdit?.filterType &&
+    formFilter?.filterType !== 'filter_time'
+      ? filterToEdit?.defaultDataMask
+      : null;
+
   const showDefaultValue =
-    !hasDataset ||
-    (!isDataDirty && hasFilledDataset) ||
-    !mainControlItems.groupby;
+    (!hasDataset ||
+      (!isDataDirty && hasFilledDataset) ||
+      !mainControlItems.groupby) &&
+    formFilter?.filterType !== 'filter_time';
+
+  const availableFilters = getAvailableFilters(filterId);
+  const hasAvailableFilters = availableFilters.length > 0;
+
+  const preFilterValidator = async () => {
+    const hasPreFilter = form.getFieldValue(['filters', filterId, 'preFilter']);
+    if (hasPreFilter) {
+      const adhocFilters = form.getFieldValue([
+        'filters',
+        filterId,
+        'adhoc_filters',
+      ]);
+      const timeRange = form.getFieldValue(['filters', filterId, 'time_range']);
+      if (!adhocFilters?.length && !timeRange) {
+        throw new Error(t('Please add at least one filter'));
+      }
+    }
+    return Promise.resolve();
+  };
 
   const onSortChanged = (value: boolean | undefined) => {
     const previous = form.getFieldValue('filters')?.[filterId].controlValues;
@@ -656,21 +682,7 @@ const FiltersConfigForm = (
 
   const defaultToFirstItem = formFilter?.controlValues?.defaultToFirstItem;
 
-  const initialDefaultValue =
-    formFilter?.filterType === filterToEdit?.filterType
-      ? filterToEdit?.defaultDataMask
-      : null;
-
-  const preFilterValidator = () => {
-    if (hasTimeRange || hasAdhoc) {
-      return Promise.resolve();
-    }
-    return Promise.reject(new Error(t('Pre-filter is required')));
-  };
-
-  const availableFilters = getAvailableFilters(filterId);
-  const hasAvailableFilters = availableFilters.length > 0;
-  const hasTimeDependency = availableFilters
+  const hasTimeDependency = getAvailableFilters(filterId)
     .filter(filter => filter.type === 'filter_time')
     .some(filter => dependencies?.includes(filter.value));
 

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t } from '@superset-ui/core';
+import { t, NO_TIME_RANGE } from '@superset-ui/core';
 import { Radio } from 'src/components/Radio';
 import {
   COMMON_RANGE_OPTIONS,
@@ -29,10 +29,10 @@ import {
 } from 'src/explore/components/controls/DateFilterControl/types';
 
 export function CommonFrame(props: FrameComponentProps) {
-  let commonRange = 'Last week';
+  let commonRange = NO_TIME_RANGE;
   if (COMMON_RANGE_SET.has(props.value as CommonRangeType)) {
     commonRange = props.value;
-  } else {
+  } else if (props.value !== NO_TIME_RANGE) {
     props.onChange(commonRange);
   }
 

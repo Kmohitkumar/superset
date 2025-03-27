@@ -61,6 +61,16 @@ function fillNativeFilters(
 ) {
   filterConfig.forEach((filter: Filter) => {
     const dataMask = initialDataMask || {};
+    // Skip default data mask for time filters
+    if (filter.filterType === 'filter_time') {
+      mergedDataMask[filter.id] = {
+        ...getInitialDataMask(filter.id),
+        filterState: {},
+        extraFormData: {},
+        ownState: {},
+      } as DataMaskWithId;
+      return;
+    }
     mergedDataMask[filter.id] = {
       ...getInitialDataMask(filter.id), // take initial data
       ...filter.defaultDataMask, // if something new came from BE - take it

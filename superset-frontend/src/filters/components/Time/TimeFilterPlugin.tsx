@@ -21,50 +21,19 @@ import { useCallback, useEffect, useState } from 'react';
 import { DatePicker } from 'src/components/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import { PluginFilterTimeProps } from './types';
-import { FilterPluginStyle } from '../common';
-
-const TimeFilterStyles = styled(FilterPluginStyle)`
-  display: flex;
-  align-items: center;
-  overflow-x: auto;
-
-  & .ant-tag {
-    margin-right: 0;
-  }
-`;
-
-const ControlContainer = styled.div<{
-  validateStatus?: 'error' | 'warning' | 'info';
-}>`
-  display: flex;
-  height: 100%;
-  max-width: 100%;
-  width: 100%;
-  & > div,
-  & > div:hover {
-    ${({ validateStatus, theme }) =>
-      validateStatus && `border-color: ${theme.colors[validateStatus]?.base}`}
-  }
-`;
+import { FilterPluginStyle, StyledFormItem, FilterContainer } from '../common';
 
 const DateRangeContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 12px;
-  background-color: ${({ theme }) => theme.colors.grayscale.light5};
-  border-radius: ${({ theme }) => theme.borderRadius}px;
   width: 100%;
+  padding: 0;
 
   .ant-picker {
     margin: 0;
     padding: 0;
   }
-`;
-
-const FilterLabel = styled.div`
-  color: ${({ theme }) => theme.colors.grayscale.base};
-  font-size: ${({ theme }) => theme.typography.sizes.s}px;
 `;
 
 export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
@@ -87,7 +56,7 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
 
   const handleTimeRangeChange = useCallback(
     (start: Dayjs | null, end: Dayjs | null): void => {
-      const isSet = start && end;
+      const isSet = start && end && start.isValid() && end.isValid();
       setDataMask({
         extraFormData: isSet
           ? {
@@ -106,25 +75,42 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
 
   useEffect(() => {
     if (filterState.value && filterState.value !== NO_TIME_RANGE) {
-      const [start, end] = filterState.value.split(' : ');
-      setStartDate(dayjs(start));
-      setEndDate(dayjs(end));
+      try {
+        const [start, end] = filterState.value.split(' : ');
+        const parsedStart = dayjs(start);
+        const parsedEnd = dayjs(end);
+
+        if (parsedStart.isValid() && parsedEnd.isValid()) {
+          setStartDate(parsedStart);
+          setEndDate(parsedEnd);
+        } else {
+          setStartDate(null);
+          setEndDate(null);
+        }
+      } catch (error) {
+        setStartDate(null);
+        setEndDate(null);
+      }
+    } else {
+      setStartDate(null);
+      setEndDate(null);
     }
   }, [filterState.value]);
 
   return props.formData?.inView ? (
-    <TimeFilterStyles width={width} height={height}>
-      <ControlContainer
-        ref={inputRef}
-        validateStatus={filterState.validateStatus}
-        onFocus={setFocusedFilter}
-        onBlur={unsetFocusedFilter}
-        onMouseEnter={setHoveredFilter}
-        onMouseLeave={unsetHoveredFilter}
-      >
-        <div style={{ width: '100%' }}>
-          <FilterLabel>{props.formData.label}</FilterLabel>
-          <DateRangeContainer>
+    <FilterPluginStyle width={width} height={height}>
+      <FilterContainer>
+        <StyledFormItem
+          validateStatus={filterState.validateStatus}
+          label={props.formData.label}
+        >
+          <DateRangeContainer
+            ref={inputRef}
+            onFocus={setFocusedFilter}
+            onBlur={unsetFocusedFilter}
+            onMouseEnter={setHoveredFilter}
+            onMouseLeave={unsetHoveredFilter}
+          >
             <DatePicker
               value={startDate}
               onChange={date => {
@@ -142,8 +128,8 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
               placeholder={t('End date')}
             />
           </DateRangeContainer>
-        </div>
-      </ControlContainer>
-    </TimeFilterStyles>
+        </StyledFormItem>
+      </FilterContainer>
+    </FilterPluginStyle>
   ) : null;
 }

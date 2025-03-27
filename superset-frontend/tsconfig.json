@@ -24,7 +24,15 @@
       ],
       "@superset-ui/plugin-chart-*": ["./plugins/plugin-chart-*/src"],
       "@superset-ui/preset-chart-*": ["./plugins/preset-chart-*/src"],
-      "@superset-ui/switchboard": ["./packages/superset-ui-switchboard/src"]
+      "@superset-ui/switchboard": ["./packages/superset-ui-switchboard/src"],
+      "src/*": ["./src/*"],
+      "src/components/*": ["./src/components/*"],
+      "src/dashboard/*": ["./src/dashboard/*"],
+      "src/explore/*": ["./src/explore/*"],
+      "src/filters/*": ["./src/filters/*"],
+      "src/utils/*": ["./src/utils/*"],
+      "src/middleware/*": ["./src/middleware/*"],
+      "src/features/*": ["./src/features/*"]
     },
     "types": [
       "@emotion/react/types/css-prop",
