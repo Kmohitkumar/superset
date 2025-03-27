@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { styled, NO_TIME_RANGE } from '@superset-ui/core';
-import { useCallback, useEffect } from 'react';
-import DateFilterControl from 'src/explore/components/controls/DateFilterControl/DateFilterLabel';
+import { styled, NO_TIME_RANGE, t } from '@superset-ui/core';
+import { useCallback, useEffect, useState } from 'react';
+import { DatePicker } from 'src/components/DatePicker';
+import dayjs, { Dayjs } from 'dayjs';
 import { PluginFilterTimeProps } from './types';
 import { FilterPluginStyle } from '../common';
 
@@ -46,6 +47,26 @@ const ControlContainer = styled.div<{
   }
 `;
 
+const DateRangeContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  background-color: ${({ theme }) => theme.colors.grayscale.light5};
+  border-radius: ${({ theme }) => theme.borderRadius}px;
+  width: 100%;
+
+  .ant-picker {
+    margin: 0;
+    padding: 0;
+  }
+`;
+
+const FilterLabel = styled.div`
+  color: ${({ theme }) => theme.colors.grayscale.base};
+  font-size: ${({ theme }) => theme.typography.sizes.s}px;
+`;
+
 export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
   const {
     setDataMask,
@@ -61,17 +82,22 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
     isOverflowingFilterBar = false,
   } = props;
 
+  const [startDate, setStartDate] = useState<Dayjs | null>(null);
+  const [endDate, setEndDate] = useState<Dayjs | null>(null);
+
   const handleTimeRangeChange = useCallback(
-    (timeRange?: string): void => {
-      const isSet = timeRange && timeRange !== NO_TIME_RANGE;
+    (start: Dayjs | null, end: Dayjs | null): void => {
+      const isSet = start && end;
       setDataMask({
         extraFormData: isSet
           ? {
-              time_range: timeRange,
+              time_range: `${start.format('YYYY-MM-DD')} : ${end.format('YYYY-MM-DD')}`,
             }
           : {},
         filterState: {
-          value: isSet ? timeRange : undefined,
+          value: isSet
+            ? `${start.format('YYYY-MM-DD')} : ${end.format('YYYY-MM-DD')}`
+            : undefined,
         },
       });
     },
@@ -79,7 +105,11 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
   );
 
   useEffect(() => {
-    handleTimeRangeChange(filterState.value);
+    if (filterState.value && filterState.value !== NO_TIME_RANGE) {
+      const [start, end] = filterState.value.split(' : ');
+      setStartDate(dayjs(start));
+      setEndDate(dayjs(end));
+    }
   }, [filterState.value]);
 
   return props.formData?.inView ? (
@@ -92,18 +122,27 @@ export default function TimeFilterPlugin(props: PluginFilterTimeProps) {
         onMouseEnter={setHoveredFilter}
         onMouseLeave={unsetHoveredFilter}
       >
-        <DateFilterControl
-          value={filterState.value || NO_TIME_RANGE}
-          name={props.formData.nativeFilterId || 'time_range'}
-          onChange={handleTimeRangeChange}
-          onOpenPopover={() => setFilterActive(true)}
-          onClosePopover={() => {
-            setFilterActive(false);
-            unsetHoveredFilter();
-            unsetFocusedFilter();
-          }}
-          isOverflowingFilterBar={isOverflowingFilterBar}
-        />
+        <div style={{ width: '100%' }}>
+          <FilterLabel>{props.formData.label}</FilterLabel>
+          <DateRangeContainer>
+            <DatePicker
+              value={startDate}
+              onChange={date => {
+                setStartDate(date);
+                handleTimeRangeChange(date, endDate);
+              }}
+              placeholder={t('Start date')}
+            />
+            <DatePicker
+              value={endDate}
+              onChange={date => {
+                setEndDate(date);
+                handleTimeRangeChange(startDate, date);
+              }}
+              placeholder={t('End date')}
+            />
+          </DateRangeContainer>
+        </div>
       </ControlContainer>
     </TimeFilterStyles>
   ) : null;
