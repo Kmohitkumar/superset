@@ -79,6 +79,8 @@ import {
 import { PivotTableChartPlugin as PivotTableChartPluginV2 } from '@superset-ui/plugin-chart-pivot-table';
 import { HandlebarsChartPlugin } from '@superset-ui/plugin-chart-handlebars';
 import { FilterPlugins } from 'src/constants';
+import { MySupersetPlugin } from 'my-superset-plugin';
+import ScatterMapChartPlugin from '@superset-custom/plugin-chart-scatter-map';
 import TimeTableChartPlugin from '../TimeTable';
 
 export default class MainPreset extends Preset {
@@ -97,26 +99,49 @@ export default class MainPreset extends Preset {
       name: 'Legacy charts',
       presets: [new DeckGLChartPreset()],
       plugins: [
+        // ECharts plugins
+        new EchartsBoxPlotChartPlugin().configure({ key: VizType.BoxPlot }),
+        new EchartsAreaChartPlugin().configure({ key: VizType.Area }),
+        new EchartsTimeseriesChartPlugin().configure({
+          key: VizType.Timeseries,
+        }),
+        new EchartsTimeseriesBarChartPlugin().configure({ key: VizType.Bar }),
+        new EchartsTimeseriesLineChartPlugin().configure({ key: VizType.Line }),
+        new EchartsTimeseriesScatterChartPlugin().configure({
+          key: VizType.Scatter,
+        }),
+        new EchartsTimeseriesSmoothLineChartPlugin().configure({
+          key: VizType.SmoothLine,
+        }),
+        new EchartsTimeseriesStepChartPlugin().configure({ key: VizType.Step }),
+        new EchartsMixedTimeseriesChartPlugin().configure({
+          key: VizType.MixedTimeseries,
+        }),
+        new EchartsPieChartPlugin().configure({ key: VizType.Pie }),
+        new EchartsGraphChartPlugin().configure({ key: VizType.Graph }),
+        new EchartsGaugeChartPlugin().configure({ key: VizType.Gauge }),
+        new EchartsHistogramChartPlugin().configure({ key: VizType.Histogram }),
+        new EchartsRadarChartPlugin().configure({ key: VizType.Radar }),
+        new EchartsFunnelChartPlugin().configure({ key: VizType.Funnel }),
+        new EchartsTreeChartPlugin().configure({ key: VizType.Tree }),
+        new EchartsTreemapChartPlugin().configure({ key: VizType.Treemap }),
+        new EchartsSunburstChartPlugin().configure({ key: VizType.Sunburst }),
+        new EchartsBubbleChartPlugin().configure({ key: VizType.Bubble }),
+        new EchartsSankeyChartPlugin().configure({ key: VizType.Sankey }),
+        new EchartsWaterfallChartPlugin().configure({ key: VizType.Waterfall }),
+        new EchartsHeatmapChartPlugin().configure({ key: VizType.Heatmap }),
+
+        // Legacy plugins
         new BigNumberChartPlugin().configure({ key: VizType.BigNumber }),
         new BigNumberTotalChartPlugin().configure({
           key: VizType.BigNumberTotal,
         }),
-        new EchartsBoxPlotChartPlugin().configure({ key: VizType.BoxPlot }),
         new BubbleChartPlugin().configure({ key: VizType.LegacyBubble }),
         new BulletChartPlugin().configure({ key: VizType.Bullet }),
         new CalendarChartPlugin().configure({ key: VizType.Calendar }),
         new ChordChartPlugin().configure({ key: VizType.Chord }),
         new CompareChartPlugin().configure({ key: VizType.Compare }),
         new CountryMapChartPlugin().configure({ key: VizType.CountryMap }),
-        new EchartsFunnelChartPlugin().configure({ key: VizType.Funnel }),
-        new EchartsSankeyChartPlugin().configure({ key: VizType.Sankey }),
-        new EchartsTreemapChartPlugin().configure({ key: VizType.Treemap }),
-        new EchartsGaugeChartPlugin().configure({ key: VizType.Gauge }),
-        new EchartsGraphChartPlugin().configure({ key: VizType.Graph }),
-        new EchartsRadarChartPlugin().configure({ key: VizType.Radar }),
-        new EchartsMixedTimeseriesChartPlugin().configure({
-          key: VizType.MixedTimeseries,
-        }),
         new HorizonChartPlugin().configure({ key: VizType.Horizon }),
         new MapBoxChartPlugin().configure({ key: VizType.MapBox }),
         new PairedTTestChartPlugin().configure({ key: VizType.PairedTTest }),
@@ -124,7 +149,6 @@ export default class MainPreset extends Preset {
           key: VizType.ParallelCoordinates,
         }),
         new PartitionChartPlugin().configure({ key: VizType.Partition }),
-        new EchartsPieChartPlugin().configure({ key: VizType.Pie }),
         new PivotTableChartPluginV2().configure({ key: VizType.PivotTable }),
         new RoseChartPlugin().configure({ key: VizType.Rose }),
         new TableChartPlugin().configure({ key: VizType.Table }),
@@ -132,45 +156,7 @@ export default class MainPreset extends Preset {
         new TimeTableChartPlugin().configure({ key: VizType.TimeTable }),
         new WordCloudChartPlugin().configure({ key: VizType.WordCloud }),
         new WorldMapChartPlugin().configure({ key: VizType.WorldMap }),
-        new EchartsAreaChartPlugin().configure({
-          key: VizType.Area,
-        }),
-        new EchartsTimeseriesChartPlugin().configure({
-          key: VizType.Timeseries,
-        }),
-        new EchartsTimeseriesBarChartPlugin().configure({
-          key: VizType.Bar,
-        }),
-        new EchartsTimeseriesLineChartPlugin().configure({
-          key: VizType.Line,
-        }),
-        new EchartsTimeseriesSmoothLineChartPlugin().configure({
-          key: VizType.SmoothLine,
-        }),
-        new EchartsTimeseriesScatterChartPlugin().configure({
-          key: VizType.Scatter,
-        }),
-        new EchartsTimeseriesStepChartPlugin().configure({
-          key: VizType.Step,
-        }),
-        new EchartsWaterfallChartPlugin().configure({
-          key: VizType.Waterfall,
-        }),
-        new EchartsHeatmapChartPlugin().configure({ key: VizType.Heatmap }),
-        new EchartsHistogramChartPlugin().configure({ key: VizType.Histogram }),
-        new SelectFilterPlugin().configure({ key: FilterPlugins.Select }),
-        new RangeFilterPlugin().configure({ key: FilterPlugins.Range }),
-        new TimeFilterPlugin().configure({ key: FilterPlugins.Time }),
-        new TimeColumnFilterPlugin().configure({
-          key: FilterPlugins.TimeColumn,
-        }),
-        new TimeGrainFilterPlugin().configure({
-          key: FilterPlugins.TimeGrain,
-        }),
-        new EchartsTreeChartPlugin().configure({ key: VizType.Tree }),
-        new EchartsSunburstChartPlugin().configure({ key: VizType.Sunburst }),
         new HandlebarsChartPlugin().configure({ key: VizType.Handlebars }),
-        new EchartsBubbleChartPlugin().configure({ key: VizType.Bubble }),
         new CartodiagramPlugin({
           defaultLayers: [
             {
@@ -184,6 +170,17 @@ export default class MainPreset extends Preset {
             },
           ],
         }).configure({ key: VizType.Cartodiagram }),
+
+        // Filter plugins
+        new SelectFilterPlugin().configure({ key: FilterPlugins.Select }),
+        new RangeFilterPlugin().configure({ key: FilterPlugins.Range }),
+        new TimeFilterPlugin().configure({ key: FilterPlugins.Time }),
+        new TimeColumnFilterPlugin().configure({
+          key: FilterPlugins.TimeColumn,
+        }),
+        new TimeGrainFilterPlugin().configure({ key: FilterPlugins.TimeGrain }),
+        new MySupersetPlugin().configure({ key: VizType.MySupersetTest }),
+        new ScatterMapChartPlugin().configure({ key: VizType.ScatterMap }),
         ...experimentalPlugins,
       ],
     });

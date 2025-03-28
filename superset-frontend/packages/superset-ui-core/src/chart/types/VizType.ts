@@ -62,4 +62,6 @@ export enum VizType {
   Waterfall = 'waterfall',
   WordCloud = 'word_cloud',
   WorldMap = 'world_map',
+  MySupersetTest = 'my_superset-test',
+  ScatterMap = 'scatter_map',
 }
