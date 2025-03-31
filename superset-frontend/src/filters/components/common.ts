@@ -32,7 +32,6 @@ export const FilterPluginStyle = styled.div<PluginFilterStylesProps>`
 export const FilterContainer = styled.div`
   align-items: center;
   width: 100%;
-  background-color: ${({ theme }) => theme.colors.grayscale.light5};
   border-radius: ${({ theme }) => theme.borderRadius}px;
   padding: ${({ theme }) => theme.gridUnit}px;
 `;

@@ -110,13 +110,36 @@ const HorizontalOverflowFilterControlContainer = styled(
 `;
 
 const VerticalFormItem = styled(StyledFormItem)`
+  && {
+    margin-bottom: 0;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    padding: ${({ theme }) => `${theme.gridUnit}px ${theme.gridUnit * 2}px`};
+    background-color: ${({ theme }) =>
+      theme.colors.grayscale.light3 || '#f5f5f5'};
+    border-radius: 12px;
+  }
+
   .ant-form-item-label {
     overflow: visible;
+    padding-bottom: 0;
+
     label.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
       &::after {
         display: none;
       }
     }
+
+    & > label::after {
+      display: none;
+    }
+  }
+
+  .ant-form-item-control {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 `;
 
@@ -124,12 +147,20 @@ const HorizontalFormItem = styled(StyledFormItem)`
   && {
     margin-bottom: 0;
     align-items: center;
+    display: flex;
+    justify-content: center;
+    padding: ${({ theme }) => theme.gridUnit}px;
+    background-color: ${({ theme }) =>
+      theme.colors.grayscale.base || '#f5f5f5'};
+    border-radius: '8px';
+    border: 1px solid ${({ theme }) => theme.colors.grayscale || '#d9d9d9'};
   }
 
   .ant-form-item-label {
     overflow: visible;
     padding-bottom: 0;
     margin-right: ${({ theme }) => theme.gridUnit * 2}px;
+
     label.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
       &::after {
         display: none;
@@ -143,6 +174,9 @@ const HorizontalFormItem = styled(StyledFormItem)`
 
   .ant-form-item-control {
     width: ${({ theme }) => theme.gridUnit * 41}px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 `;
 
