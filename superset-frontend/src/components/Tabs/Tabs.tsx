@@ -34,18 +34,31 @@ const StyledTabs = ({
 }: TabsProps) => (
   <AntdTabs
     animated={animated}
+    tabPosition="left"
     {...props}
     css={theme => css`
+      display: flex;
+      flex-direction: row;
       overflow: ${allowOverflow ? 'visible' : 'hidden'};
-      margin-top: -${theme.gridUnit * 2}px;
+
+      .ant-tabs-nav {
+        width: 180px; /* Adjust width to reduce left gap */
+        margin-left: 0; /* Remove any additional left margin */
+        padding-left: 0; /* Ensure no extra padding */
+      }
+
+      .ant-tabs-nav-list {
+        width: 100%;
+      }
 
       .ant-tabs-content-holder {
         overflow: ${allowOverflow ? 'visible' : 'auto'};
       }
+
       .ant-tabs-tab {
-        padding: ${theme.gridUnit * 2}px ${theme.gridUnit * 2}px
-          ${theme.gridUnit}px;
-        // flex: 1 1 auto;
+        flex: 1 1 auto;
+        padding-left: 0; /* Reduce padding from left */
+        margin-left: 0; /* Remove left margin */
         &.ant-tabs-tab-active .ant-tabs-tab-btn {
           color: inherit;
         }
@@ -64,26 +77,17 @@ const StyledTabs = ({
           }
         }
       }
-      ${fullWidth &&
-      css`
-        .ant-tabs-nav-list {
-          width: 100%;
-        }
-      `};
 
       .ant-tabs-tab-btn {
         display: flex;
         flex: 1 1 auto;
-        align-items: center;
-        justify-content: center;
+        align-items: flex-start;
+        justify-content: flex-start;
         font-size: ${theme.typography.sizes.s}px;
-        text-align: center;
+        text-align: left;
         user-select: none;
-        .required {
-          margin-left: ${theme.gridUnit / 2}px;
-          color: ${theme.colors.error.base};
-        }
       }
+
       .ant-tabs-ink-bar {
         background: ${theme.colors.secondary.base};
       }

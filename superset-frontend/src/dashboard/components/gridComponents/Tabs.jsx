@@ -25,6 +25,10 @@ import Icons from 'src/components/Icons';
 import { LOG_ACTIONS_SELECT_DASHBOARD_TAB } from 'src/logger/LogUtils';
 import Modal from 'src/components/Modal';
 import { DROP_LEFT, DROP_RIGHT } from 'src/dashboard/util/getDropPosition';
+import {
+  FILTER_BAR_HEADER_HEIGHT,
+  MAIN_HEADER_HEIGHT,
+} from 'src/dashboard/constants';
 import { Draggable } from '../dnd/DragDroppable';
 import DragHandle from '../dnd/DragHandle';
 import DashboardComponent from '../../containers/DashboardComponent';
@@ -37,6 +41,8 @@ import { componentShape } from '../../util/propShapes';
 import { NEW_TAB_ID } from '../../util/constants';
 import { RENDER_TAB, RENDER_TAB_CONTENT } from './Tab';
 import { TABS_TYPE, TAB_TYPE } from '../../util/componentTypes';
+import { setActiveTab } from 'src/dashboard/actions/dashboardState';
+import { dashboardLayout } from 'spec/fixtures/mockDashboardLayout';
 
 const propTypes = {
   id: PropTypes.string.isRequired,
@@ -85,6 +91,8 @@ const StyledTabsContainer = styled.div`
       min-height: ${theme.gridUnit * 12}px;
       margin-top: ${theme.gridUnit / 4}px;
       position: relative;
+      width: 100%;
+      max-width: 100%;
     }
 
     .ant-tabs {
@@ -95,7 +103,7 @@ const StyledTabsContainer = styled.div`
       }
 
       .ant-tabs-content-holder {
-        overflow: visible;
+        overflow: scroll;
       }
     }
 
@@ -104,6 +112,75 @@ const StyledTabsContainer = styled.div`
     }
   `}
 `;
+
+const StickySidebar = styled.div`
+  ${({ theme }) => css`
+    position: fixed;
+    left: 0;
+    top: ${MAIN_HEADER_HEIGHT + FILTER_BAR_HEADER_HEIGHT + 20}px;
+    height: calc(
+      100vh - ${MAIN_HEADER_HEIGHT + FILTER_BAR_HEADER_HEIGHT * 2}px
+    );
+    width: ${theme.gridUnit * 25}px;
+    background: ${theme.colors.grayscale.dark2};
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: ${theme.gridUnit * 2}px;
+    border-radius: 0 ${theme.borderRadius * 10}px ${theme.borderRadius * 10}px 0;
+
+    .sidebar-item {
+      padding: ${theme.gridUnit * 2}px;
+      margin: ${theme.gridUnit * 2}px;
+      width: 80%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      white-space: normal;
+      border: none;
+      background: none;
+      color: ${theme.colors.grayscale.light5};
+      border-radius: ${theme.borderRadius}px;
+      box-shadow: none;
+
+      &:hover {
+        background: ${theme.colors.grayscale.light4};
+        color: ${theme.colors.grayscale.dark2};
+        .sidebar-label {
+          color: ${theme.colors.grayscale.dark2};
+        }
+      }
+
+      &.active {
+        background: ${theme.colors.primary.light5};
+        color: ${theme.colors.grayscale.dark2};
+        .sidebar-label {
+          color: ${theme.colors.grayscale.dark2};
+        }
+      }
+
+      .anticon {
+        font-size: ${theme.gridUnit * 6}px;
+        margin-bottom: ${theme.gridUnit}px;
+      }
+
+      .sidebar-label {
+        font-size: ${theme.typography.sizes.xs}px;
+        color: ${theme.colors.grayscale.light5};
+        margin-top: ${theme.gridUnit}px;
+        text-align: center;
+        text-overflow: clip;
+      }
+    }
+  `}
+`;
+
 const DropIndicator = styled.div`
   border: 2px solid ${({ theme }) => theme.colors.primary.base};
   width: 5px;
@@ -240,6 +317,9 @@ const Tabs = props => {
         props.onChangeTab({ pathToTabIndex });
       }
       setActiveKey(tabIds[tabIndex]);
+      setActiveTab(tabIds[tabIndex]);
+      setSelectedTabIndex(tabIndex);
+      console.log('Selected tab:', tabIds[tabIndex], tabIndex);
     },
     [
       props.component,
@@ -409,6 +489,19 @@ const Tabs = props => {
     tabsToHighlight = nativeFilters.filters[highlightedFilterId]?.tabsInScope;
   }
 
+  const handleTabClick = useCallback(
+    tabIndex => {
+      setSelectedTabIndex(tabIndex);
+    },
+    [setSelectedTabIndex],
+  );
+  const sidebarIcons = [
+    <Icons.DashboardOutlined />,
+    <Icons.UserOutlined />,
+    <Icons.SettingOutlined />,
+    <Icons.TagOutlined />,
+  ];
+
   const renderChild = useCallback(
     ({ dragSourceRef: tabsDragSourceRef }) => (
       <StyledTabsContainer
@@ -421,8 +514,55 @@ const Tabs = props => {
             <DeleteComponentButton onDelete={handleDeleteComponent} />
           </HoverMenu>
         )}
-
-        <LineEditableTabs
+        <StickySidebar>
+          {tabIds.map((item, index) => (
+            <button
+              key={index}
+              type="button"
+              role="tab"
+              tabIndex={index}
+              className={`sidebar-item ${index === selectedTabIndex ? 'active' : ''}`}
+              onClick={() => handleClickTab(index)}
+            >
+              {sidebarIcons[index % sidebarIcons.length]}
+              <span className="sidebar-label">{item}</span>
+            </button>
+          ))}
+        </StickySidebar>
+        {/* {tabIds.map((tabId, tabIndex) => (
+          <DashboardComponent
+            id={tabId}
+            parentId={tabsComponent.id}
+            depth={depth}
+            index={tabIndex}
+            renderType={RENDER_TAB}
+            availableColumnCount={availableColumnCount}
+            columnWidth={columnWidth}
+            onDropOnTab={handleDropOnTab}
+            onDropPositionChange={handleGetDropPosition}
+            onDragTab={handleDragggingTab}
+            onHoverTab={() => handleClickTab(tabIndex)}
+            isFocused={activeKey === tabId}
+            isHighlighted={
+              activeKey !== tabId && tabsToHighlight?.includes(tabId)
+            }
+          />
+        ))} */}
+        <DashboardComponent
+          id={tabIds[selectedTabIndex]}
+          parentId={tabsComponent.id}
+          depth={depth}
+          index={selectedTabIndex}
+          renderType={RENDER_TAB_CONTENT}
+          availableColumnCount={availableColumnCount}
+          columnWidth={columnWidth}
+          onResizeStart={onResizeStart}
+          onResize={onResize}
+          onResizeStop={onResizeStop}
+          onDropOnTab={handleDropOnTab}
+          isComponentVisible
+        />
+        {/* <LineEditableTabs
           id={tabsComponent.id}
           activeKey={activeKey}
           onChange={key => {
@@ -498,33 +638,24 @@ const Tabs = props => {
               )}
             </LineEditableTabs.TabPane>
           ))}
-        </LineEditableTabs>
+        </LineEditableTabs> */}
       </StyledTabsContainer>
     ),
     [
       editMode,
       renderHoverMenu,
       handleDeleteComponent,
-      tabsComponent.id,
-      activeKey,
-      handleEdit,
       tabIds,
-      handleClickTab,
-      removeDraggedTab,
-      showDropIndicators,
+      selectedTabIndex,
+      tabsComponent.id,
       depth,
       availableColumnCount,
       columnWidth,
-      handleDropOnTab,
-      handleGetDropPosition,
-      handleDragggingTab,
-      tabsToHighlight,
-      renderTabContent,
       onResizeStart,
       onResize,
       onResizeStop,
-      selectedTabIndex,
-      isCurrentTabVisible,
+      handleDropOnTab,
+      handleTabClick,
     ],
   );
 

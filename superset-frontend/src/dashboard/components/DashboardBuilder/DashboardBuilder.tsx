@@ -134,146 +134,53 @@ const StyledContent = styled.div<{
   ${({ fullSizeChartId }) => fullSizeChartId && `z-index: 101;`}
 `;
 
-const DashboardContentWrapper = styled.div`
+const StickySidebar = styled.div`
   ${({ theme }) => css`
-    &.dashboard {
-      position: relative;
-      flex-grow: 1;
+    position: fixed;
+    left: 0;
+    top: ${MAIN_HEADER_HEIGHT + FILTER_BAR_HEADER_HEIGHT}px;
+    height: calc(100vh - ${MAIN_HEADER_HEIGHT + FILTER_BAR_HEADER_HEIGHT}px);
+    width: ${theme.gridUnit * 20}px;
+    background: ${theme.colors.grayscale.light5};
+    border-right: 1px solid ${theme.colors.grayscale.light2};
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    padding: ${theme.gridUnit * 2}px 0;
+    box-shadow: ${theme.gridUnit / 2}px 0 ${theme.gridUnit}px ${addAlpha(
+      theme.colors.grayscale.dark2,
+      parseFloat(theme.opacity.light) / 100,
+    )};
+
+    .sidebar-item {
+      padding: ${theme.gridUnit * 2}px;
+      margin: ${theme.gridUnit}px 0;
       display: flex;
       flex-direction: column;
-      height: 100%;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
 
-      /* drop shadow for top-level tabs only */
-      & .dashboard-component-tabs {
-        box-shadow: 0 ${theme.gridUnit}px ${theme.gridUnit}px 0
-          ${addAlpha(
-            theme.colors.grayscale.dark2,
-            parseFloat(theme.opacity.light) / 100,
-          )};
-        padding-left: ${theme.gridUnit * 2}px;
-        /* note this is added to tab-level padding, to match header */
+      &:hover {
+        background: ${theme.colors.grayscale.light4};
       }
 
-      .dropdown-toggle.btn.btn-primary .caret {
-        color: ${theme.colors.grayscale.light5};
+      &.active {
+        background: ${theme.colors.primary.light5};
+        color: ${theme.colors.primary.base};
       }
 
-      .background--transparent {
-        background-color: transparent;
+      .anticon {
+        font-size: ${theme.gridUnit * 6}px;
+        margin-bottom: ${theme.gridUnit}px;
       }
 
-      .background--white {
-        background-color: ${theme.colors.grayscale.light5};
-      }
-    }
-    &.dashboard--editing {
-      .grid-row:after,
-      .dashboard-component-tabs > .hover-menu:hover + div:after {
-        border: 1px dashed transparent;
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        z-index: 1;
-        pointer-events: none;
-      }
-
-      .grid-row.grid-row--hovered:after,
-      .dashboard-component-tabs > .grid-row--hovered:after {
-        border: 2px dashed ${theme.colors.primary.base};
-      }
-
-      .resizable-container {
-        & .dashboard-component-chart-holder {
-          .dashboard-chart {
-            .chart-container {
-              cursor: move;
-              opacity: 0.2;
-            }
-
-            .slice_container {
-              /* disable chart interactions in edit mode */
-              pointer-events: none;
-            }
-          }
-
-          &:hover .dashboard-chart .chart-container {
-            opacity: 0.7;
-          }
-        }
-
-        &:hover,
-        &.resizable-container--resizing:hover {
-          & > .dashboard-component-chart-holder:after {
-            border: 1px dashed ${theme.colors.primary.base};
-          }
-        }
-      }
-
-      .resizable-container--resizing:hover > .grid-row:after,
-      .hover-menu:hover + .grid-row:after,
-      .dashboard-component-tabs > .hover-menu:hover + div:after {
-        border: 1px dashed ${theme.colors.primary.base};
-        z-index: 2;
-      }
-
-      .grid-row:after,
-      .dashboard-component-tabs > .hover-menu + div:after {
-        border: 1px dashed ${theme.colors.grayscale.light2};
-      }
-
-      /* provide hit area in case row contents is edge to edge */
-      .dashboard-component-tabs-content {
-        > .dragdroppable-row {
-          padding-top: ${theme.gridUnit * 4}px;
-        }
-      }
-
-      .dashboard-component-chart-holder {
-        &:after {
-          content: '';
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          top: 0;
-          left: 0;
-          z-index: 1;
-          pointer-events: none;
-          border: 1px solid transparent;
-        }
-
-        &:hover:after {
-          border: 1px dashed ${theme.colors.primary.base};
-          z-index: 2;
-        }
-      }
-
-      .contract-trigger:before {
-        display: none;
-      }
-    }
-
-    & .dashboard-component-tabs-content {
-      & > div:not(:last-child):not(.empty-droptarget) {
-        margin-bottom: ${theme.gridUnit * 4}px;
-      }
-
-      & > .empty-droptarget {
-        z-index: ${EMPTY_CONTAINER_Z_INDEX};
-        position: absolute;
-        width: 100%;
-      }
-
-      & > .empty-droptarget:first-child:not(.empty-droptarget--full) {
-        height: ${theme.gridUnit * 4}px;
-        top: 0;
-      }
-
-      & > .empty-droptarget:last-child {
-        height: ${theme.gridUnit * 4}px;
-        bottom: ${-theme.gridUnit * 4}px;
+      .sidebar-label {
+        font-size: ${theme.typography.sizes.s}px;
+        color: ${theme.colors.grayscale.dark1};
+        margin-top: ${theme.gridUnit}px;
       }
     }
   `}
@@ -289,18 +196,13 @@ const StyledDashboardContent = styled.div<{
     flex-wrap: nowrap;
     height: auto;
     flex: 1;
-
-    .grid-container .dashboard-component-tabs {
-      box-shadow: none;
-      padding-left: 0;
-    }
+    margin-left: ${theme.gridUnit * 16}px; // Add margin for sidebar
 
     .grid-container {
-      /* without this, the grid will not get smaller upon toggling the builder panel on */
       width: 0;
       flex: 1;
       position: relative;
-      margin-top: ${theme.gridUnit * 6}px;
+      margin-top: ${theme.gridUnit * 2}px;
       margin-right: ${theme.gridUnit * 8}px;
       margin-bottom: ${theme.gridUnit * 6}px;
       margin-left: ${marginLeft}px;
@@ -312,8 +214,7 @@ const StyledDashboardContent = styled.div<{
       }px);
     `}
 
-      /* this is the ParentSize wrapper */
-    & > div:first-child {
+      & > div:first-child {
         height: inherit !important;
       }
     }
@@ -373,6 +274,148 @@ const StyledDashboardContent = styled.div<{
 const ELEMENT_ON_SCREEN_OPTIONS = {
   threshold: [1],
 };
+
+const DashboardContentWrapper = styled.div`
+  ${({ theme }) => css`
+    &.dashboard {
+      position: relative;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+
+      /* drop shadow for top-level tabs only */
+      & .dashboard-component-tabs {
+        box-shadow: 0 ${theme.gridUnit}px ${theme.gridUnit}px 0
+          ${addAlpha(
+            theme.colors.grayscale.dark2,
+            parseFloat(theme.opacity.light) / 100,
+          )};
+        padding-left: ${theme.gridUnit * 2}px;
+      }
+
+      .dropdown-toggle.btn.btn-primary .caret {
+        color: ${theme.colors.grayscale.light5};
+      }
+
+      .background--transparent {
+        background-color: transparent;
+      }
+
+      .background--white {
+        background-color: ${theme.colors.grayscale.light5};
+      }
+    }
+    &.dashboard--editing {
+      .grid-row:after,
+      .dashboard-component-tabs > .hover-menu:hover + div:after {
+        border: 1px dashed transparent;
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .grid-row.grid-row--hovered:after,
+      .dashboard-component-tabs > .grid-row--hovered:after {
+        border: 2px dashed ${theme.colors.primary.base};
+      }
+
+      .resizable-container {
+        & .dashboard-component-chart-holder {
+          .dashboard-chart {
+            .chart-container {
+              cursor: move;
+              opacity: 0.2;
+            }
+
+            .slice_container {
+              pointer-events: none;
+            }
+          }
+
+          &:hover .dashboard-chart .chart-container {
+            opacity: 0.7;
+          }
+        }
+
+        &:hover,
+        &.resizable-container--resizing:hover {
+          & > .dashboard-component-chart-holder:after {
+            border: 1px dashed ${theme.colors.primary.base};
+          }
+        }
+      }
+
+      .resizable-container--resizing:hover > .grid-row:after,
+      .hover-menu:hover + .grid-row:after,
+      .dashboard-component-tabs > .hover-menu:hover + div:after {
+        border: 1px dashed ${theme.colors.primary.base};
+        z-index: 2;
+      }
+
+      .grid-row:after,
+      .dashboard-component-tabs > .hover-menu + div:after {
+        border: 1px dashed ${theme.colors.grayscale.light2};
+      }
+
+      .dashboard-component-tabs-content {
+        > .dragdroppable-row {
+          padding-top: ${theme.gridUnit}px;
+        }
+      }
+
+      .dashboard-component-chart-holder {
+        &:after {
+          content: '';
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+          z-index: 1;
+          pointer-events: none;
+          border: 1px solid transparent;
+        }
+
+        &:hover:after {
+          border: 1px dashed ${theme.colors.primary.base};
+          z-index: 2;
+        }
+      }
+
+      .contract-trigger:before {
+        display: none;
+      }
+    }
+
+    & .dashboard-component-tabs-content {
+      & > div:not(:last-child):not(.empty-droptarget) {
+        margin-bottom: ${theme.gridUnit * 4}px;
+      }
+
+      & > .empty-droptarget {
+        z-index: ${EMPTY_CONTAINER_Z_INDEX};
+        position: absolute;
+        width: 100%;
+      }
+
+      & > .empty-droptarget:first-child:not(.empty-droptarget--full) {
+        height: ${theme.gridUnit * 4}px;
+        top: 0;
+      }
+
+      & > .empty-droptarget:last-child {
+        height: ${theme.gridUnit * 4}px;
+        bottom: ${-theme.gridUnit * 4}px;
+      }
+    }
+  `}
+`;
 
 const DashboardBuilder = () => {
   const dispatch = useDispatch();
@@ -602,14 +645,23 @@ const DashboardBuilder = () => {
     [dashboardFiltersOpen, containerRef, toggleDashboardFiltersOpen],
   );
 
+  const sidebarItems = [
+    { icon: Icons.UserOutlined, label: 'Residents' },
+    { icon: Icons.UserOutlined, label: 'Caregivers' },
+    { icon: Icons.SettingOutlined, label: 'Raw Data' },
+    { icon: Icons.SettingOutlined, label: 'System Health' },
+  ];
+
   return (
     <DashboardWrapper>
-      <div css={css`
-        display: flex;
-        flex-direction: column;
-        width: 100vw;
-        max-width: 100%;
-      `}>
+      <div
+        css={css`
+          display: flex;
+          flex-direction: column;
+          width: 100vw;
+          max-width: 100%;
+        `}
+      >
         <StyledHeader ref={headerRef}>
           {/* @ts-ignore */}
           <Droppable
@@ -622,7 +674,6 @@ const DashboardBuilder = () => {
             orientation="column"
             onDrop={handleDrop}
             editMode={editMode}
-            // you cannot drop on/displace tabs if they already exist
             disableDragDrop={!!topLevelTabs}
             style={draggableStyle}
           >
@@ -630,22 +681,30 @@ const DashboardBuilder = () => {
           </Droppable>
         </StyledHeader>
         {showFilterBar && (
-          <div css={css`
-            padding: ${theme.gridUnit * 2}px ${theme.gridUnit * 4}px;
-            background-color: ${theme.colors.grayscale.light5};
-            border-bottom: 1px solid ${theme.colors.grayscale.light2};
-            width: 100%;
-          `}>
+          <div
+            css={css`
+              padding: ${theme.gridUnit * 2}px ${theme.gridUnit * 4}px;
+              background-color: ${theme.colors.grayscale.light5};
+              // border-bottom: 1px solid ${theme.colors.grayscale.light2};
+              width: 100%;
+              position: relative;
+              z-index: 11;
+              margin-left: ${theme.gridUnit * 20}px;
+            `}
+          >
             <FilterBar
               orientation={FilterBarOrientation.Horizontal}
               hidden={isReport}
             />
           </div>
         )}
-        <StyledContent fullSizeChartId={fullSizeChartId} css={css`
-          width: 100%;
-          max-width: 100%;
-        `}>
+        <StyledContent
+          fullSizeChartId={fullSizeChartId}
+          css={css`
+            width: 100%;
+            max-width: 100%;
+          `}
+        >
           {!editMode &&
             !topLevelTabs &&
             dashboardLayout[DASHBOARD_GRID_ID]?.children?.length === 0 && (
@@ -670,14 +729,14 @@ const DashboardBuilder = () => {
             data-test="dashboard-content-wrapper"
             className={cx('dashboard', editMode && 'dashboard--editing')}
             css={css`
-              width: 100%;
-              max-width: 100%;
+              width: 95%;
+              max-width:95%;
             `}
           >
             <StyledDashboardContent
               className="dashboard-content"
               editMode={editMode}
-              marginLeft={20}
+              marginLeft={0}
               css={css`
                 width: 100%;
                 max-width: 100%;
@@ -709,14 +768,24 @@ const DashboardBuilder = () => {
                     />
                   </div>
                 ) : (
-                  <DashboardContainer
-                    topLevelTabs={topLevelTabs}
-                    onFilterButtonClick={toggleDashboardFiltersOpen}
-                    css={css`
-                      width: 100%;
-                      max-width: 100%;
-                    `}
-                  />
+                  <>
+                    {/* <StickySidebar>
+                      {sidebarItems.map((item, index) => (
+                        <div key={index} className={`sidebar-item ${index === 0 ? 'active' : ''}`}>
+                          <item.icon />
+                          <span className="sidebar-label">{item.label}</span>
+                        </div>
+                      ))}
+                    </StickySidebar> */}
+                    <div style={{ height: '10px', width: '50px' }} />
+                    <DashboardContainer
+                      topLevelTabs={topLevelTabs}
+                      css={css`
+                        width: 100%;
+                        max-width: 100%;
+                      `}
+                    />
+                  </>
                 )
               ) : (
                 <Loading />

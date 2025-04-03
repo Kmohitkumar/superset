@@ -128,7 +128,7 @@ const HorizontalFilterBar: FC<HorizontalBarProps> = ({
           <Loading position="inline-centered" />
         ) : (
           <>
-            {hasFilters && <FilterBarSettings />}
+            {/* {hasFilters && <FilterBarSettings />} */}
             {!hasFilters && (
               <FilterBarEmptyStateContainer data-test="horizontal-filterbar-empty">
                 {t('No filters are currently added to this dashboard.')}

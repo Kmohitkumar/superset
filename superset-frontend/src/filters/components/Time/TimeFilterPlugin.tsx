@@ -29,6 +29,7 @@ const DateRangeContainer = styled.div`
   gap: 8px;
   width: 100%;
   padding: 0;
+  margin: 0;
 
   .ant-picker {
     margin: 0;

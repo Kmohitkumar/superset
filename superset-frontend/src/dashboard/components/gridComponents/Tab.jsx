@@ -81,7 +81,7 @@ const defaultProps = {
 const TabTitleContainer = styled.div`
   ${({ isHighlighted, theme: { gridUnit, colors } }) => `
     padding: ${gridUnit}px ${gridUnit * 2}px;
-    margin: ${-gridUnit}px ${gridUnit * -2}px;
+    margin: ${-gridUnit}px ${gridUnit * -4}px;
     transition: box-shadow 0.2s ease-in-out;
     ${
       isHighlighted && `box-shadow: 0 0 ${gridUnit}px ${colors.primary.light1};`
@@ -298,7 +298,6 @@ const Tab = props => {
     ({ dropIndicatorProps, dragSourceRef, draggingTabOnTab }) => {
       const {
         component,
-        index,
         editMode,
         isFocused,
         isHighlighted,
@@ -324,7 +323,7 @@ const Tab = props => {
             <AnchorLink
               id={component.id}
               dashboardId={dashboardId}
-              placement={index >= 5 ? 'left' : 'right'}
+              placement="right"
             />
           )}
 

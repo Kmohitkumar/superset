@@ -73,7 +73,6 @@ import { getFilterBarTestId } from '../nativeFilters/FilterBar/utils';
 
 type DashboardContainerProps = {
   topLevelTabs?: LayoutItem;
-  onFilterButtonClick: () => void;
 };
 
 export const renderedChartIdsSelector = createSelector(
@@ -110,7 +109,6 @@ const TOP_OF_PAGE_RANGE = 220;
 
 const DashboardContainer: FC<DashboardContainerProps> = ({
   topLevelTabs,
-  onFilterButtonClick,
 }) => {
   const nativeFilterScopes = useNativeFilterScopes();
   const dispatch = useDispatch();
@@ -284,40 +282,36 @@ const DashboardContainer: FC<DashboardContainerProps> = ({
 
   const renderParentSizeChildren = useCallback(
     ({ width }) => (
-      /*
-      We use a TabContainer irrespective of whether top-level tabs exist to maintain
-      a consistent React component tree. This avoids expensive mounts/unmounts of
-      the entire dashboard upon adding/removing top-level tabs, which would otherwise
-      happen because of React's diffing algorithm
-    */
-      <Tabs
-        id={DASHBOARD_GRID_ID}
-        activeKey={activeKey}
-        renderTabBar={renderTabBar}
-        fullWidth
-        animated={false}
-        allowOverflow
-        onFocus={handleFocus}
-      >
-        {childIds.map((id, index) => (
-          // Matching the key of the first TabPane irrespective of topLevelTabs
-          // lets us keep the same React component tree when !!topLevelTabs changes.
-          // This avoids expensive mounts/unmounts of the entire dashboard.
-          <>
-            <Tabs.TabPane
-              key={index === 0 ? DASHBOARD_GRID_ID : index.toString()}
-            >
-              <DashboardGrid
-                gridComponent={dashboardLayout[id]}
-                // see isValidChild for why tabs do not increment the depth of their children
-                depth={DASHBOARD_ROOT_DEPTH + 1} // (topLevelTabs ? 0 : 1)}
-                width={width}
-                isComponentVisible={index === tabIndex}
-              />
-            </Tabs.TabPane>
-          </>
-        ))}
-      </Tabs>
+      <div style={{ flex: 1, paddingLeft: '16px',}}>
+          {childIds.map((id, index) => (
+            <DashboardGrid
+              key={id}
+              gridComponent={dashboardLayout[id]}
+              depth={DASHBOARD_ROOT_DEPTH + 1}
+              width={width}
+              isComponentVisible={index === tabIndex}
+            />
+          ))}
+        </div>
+      // <div style={{ display: 'flex', height: '100vh' }}>
+      //   <Tabs
+      //     id={DASHBOARD_GRID_ID}
+      //     activeKey={activeKey}
+      //     renderTabBar={renderTabBar}
+      //     fullWidth
+      //     animated={false}
+      //     allowOverflow
+      //     tabPosition="left"
+      //     onFocus={handleFocus}
+      //   >
+      //     {childIds.map((id, index) => (
+      //       <Tabs.TabPane
+      //         key={index === 0 ? DASHBOARD_GRID_ID : index.toString()}
+      //         tab={`Tab ${index + 1}`}
+      //       />
+      //     ))}
+      //   </Tabs>
+      // </div>
     ),
     [
       activeKey,
@@ -326,8 +320,7 @@ const DashboardContainer: FC<DashboardContainerProps> = ({
       handleFocus,
       renderTabBar,
       tabIndex,
-      onFilterButtonClick,
-    ],
+    ]
   );
 
   return (
