@@ -21,6 +21,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { useDispatch, useSelector } from 'react-redux';
 import { styled, t } from '@superset-ui/core';
+import Icons from 'src/components/Icons';
 
 import { EmptyState } from 'src/components/EmptyState';
 import EditableTitle from 'src/components/EditableTitle';
@@ -77,6 +78,13 @@ const defaultProps = {
   onResize() {},
   onResizeStop() {},
 };
+
+const sidebarIcons = [
+  <Icons.TeamOutlined />,
+  <Icons.UserOutlined />,
+  <Icons.CheckCircleOutlined />,
+  <Icons.ExclamationCircleOutlined />,
+];
 
 const TabTitleContainer = styled.div`
   ${({ isHighlighted, theme: { gridUnit, colors } }) => `
@@ -306,35 +314,46 @@ const Tab = props => {
         embeddedMode,
       } = props;
       return (
-        <TabTitleContainer
-          isHighlighted={isHighlighted}
-          className="dragdroppable-tab"
-          ref={dragSourceRef}
+        <button
+          key={index}
+          type="button"
+          role="tab"
+          tabIndex={index}
+          className={`sidebar-item ${isHighlighted ? 'active' : ''}`}
+          onClick={() => handleChangeTab(index)}
         >
-          <EditableTitle
-            title={component.meta.text}
-            defaultTitle={component.meta.defaultText}
-            placeholder={component.meta.placeholder}
-            canEdit={editMode && isFocused}
-            onSaveTitle={handleChangeText}
-            showTooltip={false}
-            editing={editMode && isFocused}
-          />
-          {!editMode && !embeddedMode && (
-            <AnchorLink
-              id={component.id}
-              dashboardId={dashboardId}
-              placement={index >= 5 ? 'left' : 'right'}
-            />
-          )}
+          {sidebarIcons[index % sidebarIcons.length]}
+          <span className="sidebar-label">{component.meta.text}</span>
+        </button>
+        // <TabTitleContainer
+        //   isHighlighted={isHighlighted}
+        //   className="dragdroppable-tab"
+        //   ref={dragSourceRef}
+        // >
+        //   <EditableTitle
+        //     title={component.meta.text}
+        //     defaultTitle={component.meta.defaultText}
+        //     placeholder={component.meta.placeholder}
+        //     canEdit={editMode && isFocused}
+        //     onSaveTitle={handleChangeText}
+        //     showTooltip={false}
+        //     editing={editMode && isFocused}
+        //   />
+        //   {!editMode && !embeddedMode && (
+        //     <AnchorLink
+        //       id={component.id}
+        //       dashboardId={dashboardId}
+        //       placement={index >= 5 ? 'left' : 'right'}
+        //     />
+        //   )}
 
-          {dropIndicatorProps && !draggingTabOnTab && (
-            <TitleDropIndicator
-              className={dropIndicatorProps.className}
-              data-test="title-drop-indicator"
-            />
-          )}
-        </TabTitleContainer>
+        //   {dropIndicatorProps && !draggingTabOnTab && (
+        //     <TitleDropIndicator
+        //       className={dropIndicatorProps.className}
+        //       data-test="title-drop-indicator"
+        //     />
+        //   )}
+        // </TabTitleContainer>
       );
     },
     [

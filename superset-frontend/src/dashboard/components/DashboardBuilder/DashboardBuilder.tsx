@@ -303,7 +303,7 @@ const StyledDashboardContent = styled.div<{
       margin-top: ${theme.gridUnit * 6}px;
       margin-right: ${theme.gridUnit * 8}px;
       margin-bottom: ${theme.gridUnit * 6}px;
-      margin-left: 8%;
+      margin-left: ${editMode ? 0 : 8}%;
 
       ${editMode &&
       `

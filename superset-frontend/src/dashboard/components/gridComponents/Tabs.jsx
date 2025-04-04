@@ -41,6 +41,7 @@ import getLeafComponentIdFromPath from '../../util/getLeafComponentIdFromPath';
 import { componentShape } from '../../util/propShapes';
 import { RENDER_TAB, RENDER_TAB_CONTENT } from './Tab';
 import { TABS_TYPE, TAB_TYPE } from '../../util/componentTypes';
+import { dashboardLayout } from 'spec/fixtures/mockDashboardLayout';
 
 const propTypes = {
   id: PropTypes.string.isRequired,
@@ -194,10 +195,10 @@ const StickySidebar = styled.div`
 `;
 
 const sidebarIcons = [
-  <Icons.DashboardOutlined />,
+  <Icons.TeamOutlined />,
   <Icons.UserOutlined />,
-  <Icons.PieChartOutlined />,
-  <Icons.BarChartOutlined />,
+  <Icons.CheckCircleOutlined />,
+  <Icons.ExclamationCircleOutlined />,
 ];
 
 const CloseIconWithDropIndicator = props => (
@@ -208,7 +209,6 @@ const CloseIconWithDropIndicator = props => (
     )}
   </>
 );
-
 
 const Tabs = props => {
   const nativeFilters = useSelector(state => state.nativeFilters);
@@ -511,17 +511,37 @@ const Tabs = props => {
 
         <StickySidebar>
           {tabIds.map((item, index) => (
-            <button
-              key={index}
-              type="button"
-              role="tab"
-              tabIndex={index}
-              className={`sidebar-item ${index === selectedTabIndex ? 'active' : ''}`}
-              onClick={() => handleClickTab(index)}
-            >
-              {sidebarIcons[index % sidebarIcons.length]}
-              <span className="sidebar-label">{item}</span>
-            </button>
+            // <button
+            //   key={index}
+            //   type="button"
+            //   role="tab"
+            //   tabIndex={index}
+            //   className={`sidebar-item ${index === selectedTabIndex ? 'active' : ''}`}
+            //   onClick={() => handleClickTab(index)}
+            // >
+            //   {sidebarIcons[index % sidebarIcons.length]}
+            //   <span className="sidebar-label">
+            //     {console.log('check', tabsComponent, dashboardLayout)}
+            //     {item}
+            //   </span>
+            // </button>
+            <DashboardComponent
+              id={item}
+              parentId={tabsComponent.id}
+              depth={depth}
+              index={index}
+              renderType={RENDER_TAB}
+              availableColumnCount={availableColumnCount}
+              columnWidth={columnWidth}
+              onDropOnTab={handleDropOnTab}
+              onDropPositionChange={handleGetDropPosition}
+              onDragTab={handleDragggingTab}
+              onHoverTab={() => handleClickTab(index)}
+              isFocused={activeKey === item}
+              isHighlighted={
+                activeKey !== item && tabsToHighlight?.includes(item)
+              }
+            />
           ))}
         </StickySidebar>
 

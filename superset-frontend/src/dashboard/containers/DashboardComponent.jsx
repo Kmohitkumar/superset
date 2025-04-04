@@ -93,6 +93,7 @@ const DashboardComponent = props => {
   // doing this allows us to not pass the entire component lookup to all Components
   const { occupiedColumnCount, minColumnWidth } = useMemo(() => {
     if (component) {
+      console.log('test', component);
       const componentType = component.type;
       if (componentType === ROW_TYPE || componentType === COLUMN_TYPE) {
         const { occupiedWidth, minimumWidth } = getDetailedComponentWidth({
@@ -113,6 +114,7 @@ const DashboardComponent = props => {
   }, [component, dashboardLayout, props.id]);
 
   const Component = component ? componentLookup[component.type] : null;
+  console.log('test2', Component);
   return Component ? (
     <Component
       {...props}
