@@ -21,6 +21,11 @@ import PropTypes from 'prop-types';
 import { styled, t, usePrevious, css } from '@superset-ui/core';
 import { useSelector } from 'react-redux';
 import { LineEditableTabs } from 'src/components/Tabs';
+import {
+  MAIN_HEADER_HEIGHT,
+  FILTER_BAR_HEADER_HEIGHT,
+  NEW_TAB_ID,
+} from 'src/dashboard/constants';
 import Icons from 'src/components/Icons';
 import { LOG_ACTIONS_SELECT_DASHBOARD_TAB } from 'src/logger/LogUtils';
 import Modal from 'src/components/Modal';
@@ -34,7 +39,6 @@ import findTabIndexByComponentId from '../../util/findTabIndexByComponentId';
 import getDirectPathToTabIndex from '../../util/getDirectPathToTabIndex';
 import getLeafComponentIdFromPath from '../../util/getLeafComponentIdFromPath';
 import { componentShape } from '../../util/propShapes';
-import { NEW_TAB_ID } from '../../util/constants';
 import { RENDER_TAB, RENDER_TAB_CONTENT } from './Tab';
 import { TABS_TYPE, TAB_TYPE } from '../../util/componentTypes';
 
@@ -114,6 +118,88 @@ const DropIndicator = styled.div`
   border-radius: 2px;
 `;
 
+const StickySidebar = styled.div`
+  ${({ theme }) => css`
+    position: fixed;
+    left: 0;
+    top: ${MAIN_HEADER_HEIGHT + FILTER_BAR_HEADER_HEIGHT}px;
+    height: calc(100vh - ${MAIN_HEADER_HEIGHT + FILTER_BAR_HEADER_HEIGHT}px);
+    width: 7%;
+    background: ${theme.colors.grayscale.dark1};
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: ${theme.gridUnit * 2}px;
+    border-radius: 0 ${theme.borderRadius * 10}px ${theme.borderRadius * 10}px 0;
+
+    .sidebar-item {
+      padding: ${theme.gridUnit * 2}px;
+      margin: ${theme.gridUnit * 2}px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      white-space: normal;
+      border: none;
+      background: none;
+      color: ${theme.colors.grayscale.light5};
+      border-radius: ${theme.borderRadius}px;
+      box-shadow: none;
+
+      &:hover {
+        color: ${theme.colors.grayscale.dark2};
+        .sidebar-label {
+          color: ${theme.colors.grayscale.light5};
+        }
+        .anticon {
+          color: ${theme.colors.grayscale.light5};
+        }
+      }
+
+      &.active {
+        color: ${theme.colors.grayscale.dark2};
+        .sidebar-label {
+          color: ${theme.colors.grayscale.light5};
+        }
+        .anticon {
+          color: ${theme.colors.grayscale.light5};
+        }
+        border-right: 3px solid ${theme.colors.grayscale.light5};
+      }
+
+      .anticon {
+        font-size: ${theme.gridUnit * 8}px;
+        margin-bottom: ${theme.gridUnit}px;
+        color: ${theme.colors.grayscale.light1};
+      }
+
+      .sidebar-label {
+        font-size: ${theme.typography.sizes.xs}px;
+        color: ${theme.colors.grayscale.light1};
+        margin-top: ${theme.gridUnit}px;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: clip;
+        white-space: nowrap;
+        width: 100%;
+      }
+    }
+  `}
+`;
+
+const sidebarIcons = [
+  <Icons.DashboardOutlined />,
+  <Icons.UserOutlined />,
+  <Icons.PieChartOutlined />,
+  <Icons.BarChartOutlined />,
+];
+
 const CloseIconWithDropIndicator = props => (
   <>
     <Icons.CloseOutlined iconSize="s" />
@@ -122,6 +208,7 @@ const CloseIconWithDropIndicator = props => (
     )}
   </>
 );
+
 
 const Tabs = props => {
   const nativeFilters = useSelector(state => state.nativeFilters);
@@ -422,7 +509,40 @@ const Tabs = props => {
           </HoverMenu>
         )}
 
-        <LineEditableTabs
+        <StickySidebar>
+          {tabIds.map((item, index) => (
+            <button
+              key={index}
+              type="button"
+              role="tab"
+              tabIndex={index}
+              className={`sidebar-item ${index === selectedTabIndex ? 'active' : ''}`}
+              onClick={() => handleClickTab(index)}
+            >
+              {sidebarIcons[index % sidebarIcons.length]}
+              <span className="sidebar-label">{item}</span>
+            </button>
+          ))}
+        </StickySidebar>
+
+        {renderTabContent && (
+          <DashboardComponent
+            id={tabIds[selectedTabIndex]}
+            parentId={tabsComponent.id}
+            depth={depth} // see isValidChild.js for why tabs don't increment child depth
+            index={selectedTabIndex}
+            renderType={RENDER_TAB_CONTENT}
+            availableColumnCount={availableColumnCount}
+            columnWidth={columnWidth}
+            onResizeStart={onResizeStart}
+            onResize={onResize}
+            onResizeStop={onResizeStop}
+            onDropOnTab={handleDropOnTab}
+            isComponentVisible
+          />
+        )}
+
+        {/* <LineEditableTabs
           id={tabsComponent.id}
           activeKey={activeKey}
           onChange={key => {
@@ -498,7 +618,7 @@ const Tabs = props => {
               )}
             </LineEditableTabs.TabPane>
           ))}
-        </LineEditableTabs>
+        </LineEditableTabs> */}
       </StyledTabsContainer>
     ),
     [

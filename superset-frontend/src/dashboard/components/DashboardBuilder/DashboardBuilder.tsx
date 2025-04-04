@@ -303,7 +303,7 @@ const StyledDashboardContent = styled.div<{
       margin-top: ${theme.gridUnit * 6}px;
       margin-right: ${theme.gridUnit * 8}px;
       margin-bottom: ${theme.gridUnit * 6}px;
-      margin-left: ${marginLeft}px;
+      margin-left: 8%;
 
       ${editMode &&
       `
@@ -631,10 +631,9 @@ const DashboardBuilder = () => {
         </StyledHeader>
         {showFilterBar && (
           <div css={css`
-            padding: ${theme.gridUnit * 2}px ${theme.gridUnit * 4}px;
-            background-color: ${theme.colors.grayscale.light5};
-            border-bottom: 1px solid ${theme.colors.grayscale.light2};
-            width: 100%;
+            padding: ${theme.gridUnit}px ${theme.gridUnit * 4}px;
+            width: 95%;
+            margin-left: 5%;
           `}>
             <FilterBar
               orientation={FilterBarOrientation.Horizontal}
@@ -671,13 +670,13 @@ const DashboardBuilder = () => {
             className={cx('dashboard', editMode && 'dashboard--editing')}
             css={css`
               width: 100%;
-              max-width: 100%;
+              max-width: 100%
             `}
           >
             <StyledDashboardContent
               className="dashboard-content"
               editMode={editMode}
-              marginLeft={20}
+              marginLeft={200}
               css={css`
                 width: 100%;
                 max-width: 100%;
