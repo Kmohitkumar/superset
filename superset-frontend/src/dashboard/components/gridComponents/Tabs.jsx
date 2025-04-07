@@ -525,23 +525,32 @@ const Tabs = props => {
             //     {item}
             //   </span>
             // </button>
-            <DashboardComponent
-              id={item}
-              parentId={tabsComponent.id}
-              depth={depth}
-              index={index}
-              renderType={RENDER_TAB}
-              availableColumnCount={availableColumnCount}
-              columnWidth={columnWidth}
-              onDropOnTab={handleDropOnTab}
-              onDropPositionChange={handleGetDropPosition}
-              onDragTab={handleDragggingTab}
-              onHoverTab={() => handleClickTab(index)}
-              isFocused={activeKey === item}
-              isHighlighted={
-                activeKey !== item && tabsToHighlight?.includes(item)
-              }
-            />
+            <button
+              key={index}
+              type="button"
+              role="tab"
+              tabIndex={index}
+              className={`sidebar-item ${index === selectedTabIndex ? 'active' : ''}`}
+              onClick={() => handleClickTab(index)}
+            >
+              <DashboardComponent
+                id={item}
+                parentId={tabsComponent.id}
+                depth={depth}
+                index={index}
+                renderType={RENDER_TAB}
+                availableColumnCount={availableColumnCount}
+                columnWidth={columnWidth}
+                onDropOnTab={handleDropOnTab}
+                onDropPositionChange={handleGetDropPosition}
+                onDragTab={handleDragggingTab}
+                onHoverTab={() => handleClickTab(index)}
+                isFocused={activeKey === item}
+                isHighlighted={
+                  activeKey !== item && tabsToHighlight?.includes(item)
+                }
+              />
+            </button>
           ))}
         </StickySidebar>
 
