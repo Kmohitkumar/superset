@@ -30,6 +30,7 @@ import Icons from 'src/components/Icons';
 import { LOG_ACTIONS_SELECT_DASHBOARD_TAB } from 'src/logger/LogUtils';
 import Modal from 'src/components/Modal';
 import { DROP_LEFT, DROP_RIGHT } from 'src/dashboard/util/getDropPosition';
+import logo from 'src/assets/images/carelife-logo.png';
 import { Draggable } from '../dnd/DragDroppable';
 import DragHandle from '../dnd/DragHandle';
 import DashboardComponent from '../../containers/DashboardComponent';
@@ -131,9 +132,17 @@ const StickySidebar = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: ${theme.gridUnit * 2}px;
+    justify-content: flex-start;
+    padding-top: ${theme.gridUnit * 3}px;
     border-radius: 0 ${theme.borderRadius * 10}px ${theme.borderRadius * 10}px 0;
+
+    .sidebar-logo {
+      width: 80%;
+      margin-bottom: ${theme.gridUnit * 3}px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
     .sidebar-item {
       padding: ${theme.gridUnit * 2}px;
@@ -150,7 +159,6 @@ const StickySidebar = styled.div`
       border: none;
       background: none;
       color: ${theme.colors.grayscale.light5};
-      border-radius: ${theme.borderRadius}px;
       box-shadow: none;
 
       &:hover {
@@ -171,7 +179,7 @@ const StickySidebar = styled.div`
         .anticon {
           color: ${theme.colors.grayscale.light5};
         }
-        border-right: 3px solid ${theme.colors.grayscale.light5};
+        border-right: 5px solid ${theme.colors.grayscale.light5};
       }
 
       .anticon {
@@ -510,6 +518,9 @@ const Tabs = props => {
         )}
 
         <StickySidebar>
+          <div className="sidebar-logo">
+            <img src={logo} alt="logo" style={{ width: '100%' }} />
+          </div>
           {tabIds.map((item, index) => (
             // <button
             //   key={index}
