@@ -49,6 +49,7 @@ const propTypes = {
   directPathToChild: PropTypes.arrayOf(PropTypes.string),
   directPathLastUpdated: PropTypes.number,
   isComponentVisible: PropTypes.bool,
+  isSubTab: PropTypes.bool,
 };
 
 const DashboardComponent = props => {
@@ -114,7 +115,6 @@ const DashboardComponent = props => {
   }, [component, dashboardLayout, props.id]);
 
   const Component = component ? componentLookup[component.type] : null;
-  console.log('test2', Component);
   return Component ? (
     <Component
       {...props}

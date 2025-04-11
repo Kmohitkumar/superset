@@ -130,13 +130,13 @@ const plugins = [
   // static pages
   new HtmlWebpackPlugin({
     template: './src/assets/staticPages/404.html',
-    inject: true,
+    inject: false,
     chunks: [],
     filename: '404.html',
   }),
   new HtmlWebpackPlugin({
     template: './src/assets/staticPages/500.html',
-    inject: true,
+    inject: false,
     chunks: [],
     filename: '500.html',
   }),

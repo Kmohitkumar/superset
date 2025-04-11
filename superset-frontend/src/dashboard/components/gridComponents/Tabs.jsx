@@ -42,7 +42,6 @@ import getLeafComponentIdFromPath from '../../util/getLeafComponentIdFromPath';
 import { componentShape } from '../../util/propShapes';
 import { RENDER_TAB, RENDER_TAB_CONTENT } from './Tab';
 import { TABS_TYPE, TAB_TYPE } from '../../util/componentTypes';
-import { dashboardLayout } from 'spec/fixtures/mockDashboardLayout';
 
 const propTypes = {
   id: PropTypes.string.isRequired,
@@ -73,6 +72,8 @@ const propTypes = {
   onChangeTab: PropTypes.func.isRequired,
   deleteComponent: PropTypes.func.isRequired,
   updateComponents: PropTypes.func.isRequired,
+
+  isSubTab: PropTypes.bool,
 };
 
 const defaultProps = {
@@ -123,7 +124,7 @@ const DropIndicator = styled.div`
 const StickySidebar = styled.div`
   ${({ theme }) => css`
     position: fixed;
-    left: 0;
+    left: 0%;
     top: ${MAIN_HEADER_HEIGHT + FILTER_BAR_HEADER_HEIGHT}px;
     height: calc(100vh - ${MAIN_HEADER_HEIGHT + FILTER_BAR_HEADER_HEIGHT}px);
     width: 7%;
@@ -516,54 +517,121 @@ const Tabs = props => {
             <DeleteComponentButton onDelete={handleDeleteComponent} />
           </HoverMenu>
         )}
-
-        <StickySidebar>
-          <div className="sidebar-logo">
-            <img src={logo} alt="logo" style={{ width: '100%' }} />
-          </div>
-          {tabIds.map((item, index) => (
-            // <button
-            //   key={index}
-            //   type="button"
-            //   role="tab"
-            //   tabIndex={index}
-            //   className={`sidebar-item ${index === selectedTabIndex ? 'active' : ''}`}
-            //   onClick={() => handleClickTab(index)}
-            // >
-            //   {sidebarIcons[index % sidebarIcons.length]}
-            //   <span className="sidebar-label">
-            //     {console.log('check', tabsComponent, dashboardLayout)}
-            //     {item}
-            //   </span>
-            // </button>
-            <button
-              key={index}
-              type="button"
-              role="tab"
-              tabIndex={index}
-              className={`sidebar-item ${index === selectedTabIndex ? 'active' : ''}`}
-              onClick={() => handleClickTab(index)}
-            >
-              <DashboardComponent
-                id={item}
-                parentId={tabsComponent.id}
-                depth={depth}
-                index={index}
-                renderType={RENDER_TAB}
-                availableColumnCount={availableColumnCount}
-                columnWidth={columnWidth}
-                onDropOnTab={handleDropOnTab}
-                onDropPositionChange={handleGetDropPosition}
-                onDragTab={handleDragggingTab}
-                onHoverTab={() => handleClickTab(index)}
-                isFocused={activeKey === item}
-                isHighlighted={
-                  activeKey !== item && tabsToHighlight?.includes(item)
+        {props.parentId.includes(TAB_TYPE) ? (
+          <LineEditableTabs
+            id={tabsComponent.id}
+            activeKey={activeKey}
+            onChange={key => {
+              handleClickTab(tabIds.indexOf(key));
+            }}
+            onEdit={handleEdit}
+            data-test="nav-list"
+            type={editMode ? 'editable-card' : 'card'}
+          >
+            {tabIds.map((tabId, tabIndex) => (
+              <LineEditableTabs.TabPane
+                key={tabId}
+                tab={
+                  removeDraggedTab(tabId) ? (
+                    <></>
+                  ) : (
+                    <>
+                      {showDropIndicators(tabIndex).left && (
+                        <DropIndicator
+                          className="drop-indicator-left"
+                          pos="left"
+                        />
+                      )}
+                      <DashboardComponent
+                        id={tabId}
+                        parentId={tabsComponent.id}
+                        depth={depth}
+                        index={tabIndex}
+                        renderType={RENDER_TAB}
+                        availableColumnCount={availableColumnCount}
+                        columnWidth={columnWidth}
+                        onDropOnTab={handleDropOnTab}
+                        onDropPositionChange={handleGetDropPosition}
+                        onDragTab={handleDragggingTab}
+                        onHoverTab={() => handleClickTab(tabIndex)}
+                        isFocused={activeKey === tabId}
+                        isHighlighted={
+                          activeKey !== tabId &&
+                          tabsToHighlight?.includes(tabId)
+                        }
+                        isSubTab
+                      />
+                    </>
+                  )
                 }
-              />
-            </button>
-          ))}
-        </StickySidebar>
+                closeIcon={
+                  removeDraggedTab(tabId) ? (
+                    <></>
+                  ) : (
+                    <CloseIconWithDropIndicator
+                      role="button"
+                      tabIndex={tabIndex}
+                      showDropIndicators={showDropIndicators(tabIndex)}
+                    />
+                  )
+                }
+              >
+                {/* {renderTabContent && (
+                  <DashboardComponent
+                    id={tabId}
+                    parentId={tabsComponent.id}
+                    depth={depth} // see isValidChild.js for why tabs don't increment child depth
+                    index={tabIndex}
+                    renderType={RENDER_TAB_CONTENT}
+                    availableColumnCount={availableColumnCount}
+                    columnWidth={columnWidth}
+                    onResizeStart={onResizeStart}
+                    onResize={onResize}
+                    onResizeStop={onResizeStop}
+                    onDropOnTab={handleDropOnTab}
+                    isComponentVisible={
+                      selectedTabIndex === tabIndex && isCurrentTabVisible
+                    }
+                  />
+                )} */}
+              </LineEditableTabs.TabPane>
+            ))}
+          </LineEditableTabs>
+        ) : (
+          <StickySidebar>
+            <div className="sidebar-logo">
+              <img src={logo} alt="logo" style={{ width: '100%' }} />
+            </div>
+            {tabIds.map((item, index) => (
+              <button
+                key={index}
+                type="button"
+                role="tab"
+                tabIndex={index}
+                className={`sidebar-item ${index === selectedTabIndex ? 'active' : ''}`}
+                onClick={() => handleClickTab(index)}
+              >
+                <DashboardComponent
+                  id={item}
+                  parentId={tabsComponent.id}
+                  depth={depth}
+                  index={index}
+                  renderType={RENDER_TAB}
+                  availableColumnCount={availableColumnCount}
+                  columnWidth={columnWidth}
+                  onDropOnTab={handleDropOnTab}
+                  onDropPositionChange={handleGetDropPosition}
+                  onDragTab={handleDragggingTab}
+                  onHoverTab={() => handleClickTab(index)}
+                  isFocused={activeKey === item}
+                  isHighlighted={
+                    activeKey !== item && tabsToHighlight?.includes(item)
+                  }
+                />
+              </button>
+            ))}
+          </StickySidebar>
+        )}
 
         {renderTabContent && (
           <DashboardComponent
@@ -581,84 +649,6 @@ const Tabs = props => {
             isComponentVisible
           />
         )}
-
-        {/* <LineEditableTabs
-          id={tabsComponent.id}
-          activeKey={activeKey}
-          onChange={key => {
-            handleClickTab(tabIds.indexOf(key));
-          }}
-          onEdit={handleEdit}
-          data-test="nav-list"
-          type={editMode ? 'editable-card' : 'card'}
-        >
-          {tabIds.map((tabId, tabIndex) => (
-            <LineEditableTabs.TabPane
-              key={tabId}
-              tab={
-                removeDraggedTab(tabId) ? (
-                  <></>
-                ) : (
-                  <>
-                    {showDropIndicators(tabIndex).left && (
-                      <DropIndicator
-                        className="drop-indicator-left"
-                        pos="left"
-                      />
-                    )}
-                    <DashboardComponent
-                      id={tabId}
-                      parentId={tabsComponent.id}
-                      depth={depth}
-                      index={tabIndex}
-                      renderType={RENDER_TAB}
-                      availableColumnCount={availableColumnCount}
-                      columnWidth={columnWidth}
-                      onDropOnTab={handleDropOnTab}
-                      onDropPositionChange={handleGetDropPosition}
-                      onDragTab={handleDragggingTab}
-                      onHoverTab={() => handleClickTab(tabIndex)}
-                      isFocused={activeKey === tabId}
-                      isHighlighted={
-                        activeKey !== tabId && tabsToHighlight?.includes(tabId)
-                      }
-                    />
-                  </>
-                )
-              }
-              closeIcon={
-                removeDraggedTab(tabId) ? (
-                  <></>
-                ) : (
-                  <CloseIconWithDropIndicator
-                    role="button"
-                    tabIndex={tabIndex}
-                    showDropIndicators={showDropIndicators(tabIndex)}
-                  />
-                )
-              }
-            >
-              {renderTabContent && (
-                <DashboardComponent
-                  id={tabId}
-                  parentId={tabsComponent.id}
-                  depth={depth} // see isValidChild.js for why tabs don't increment child depth
-                  index={tabIndex}
-                  renderType={RENDER_TAB_CONTENT}
-                  availableColumnCount={availableColumnCount}
-                  columnWidth={columnWidth}
-                  onResizeStart={onResizeStart}
-                  onResize={onResize}
-                  onResizeStop={onResizeStop}
-                  onDropOnTab={handleDropOnTab}
-                  isComponentVisible={
-                    selectedTabIndex === tabIndex && isCurrentTabVisible
-                  }
-                />
-              )}
-            </LineEditableTabs.TabPane>
-          ))}
-        </LineEditableTabs> */}
       </StyledTabsContainer>
     ),
     [

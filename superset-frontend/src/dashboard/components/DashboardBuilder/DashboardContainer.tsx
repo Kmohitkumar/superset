@@ -307,6 +307,7 @@ const DashboardContainer: FC<DashboardContainerProps> = ({
             <Tabs.TabPane
               key={index === 0 ? DASHBOARD_GRID_ID : index.toString()}
             >
+              {console.log("grid", dashboardLayout[id])}
               <DashboardGrid
                 gridComponent={dashboardLayout[id]}
                 // see isValidChild for why tabs do not increment the depth of their children

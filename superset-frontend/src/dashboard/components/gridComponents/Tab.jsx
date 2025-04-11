@@ -53,6 +53,7 @@ const propTypes = {
   onHoverTab: PropTypes.func,
   editMode: PropTypes.bool.isRequired,
   embeddedMode: PropTypes.bool,
+  isSubTab: PropTypes.bool,
 
   // grid related
   availableColumnCount: PropTypes.number,
@@ -313,7 +314,37 @@ const Tab = props => {
         dashboardId,
         embeddedMode,
       } = props;
-      return (
+      return props.isSubTab ? (
+        <TabTitleContainer
+          isHighlighted={isHighlighted}
+          className="dragdroppable-tab"
+          ref={dragSourceRef}
+        >
+          <EditableTitle
+            title={component.meta.text}
+            defaultTitle={component.meta.defaultText}
+            placeholder={component.meta.placeholder}
+            canEdit={editMode && isFocused}
+            onSaveTitle={handleChangeText}
+            showTooltip={false}
+            editing={editMode && isFocused}
+          />
+          {/* {!editMode && !embeddedMode && (
+            <AnchorLink
+              id={component.id}
+              dashboardId={dashboardId}
+              placement={index >= 5 ? 'left' : 'right'}
+            />
+          )} */}
+
+          {dropIndicatorProps && !draggingTabOnTab && (
+            <TitleDropIndicator
+              className={dropIndicatorProps.className}
+              data-test="title-drop-indicator"
+            />
+          )}
+        </TabTitleContainer>
+      ) : (
         <button
           key={index}
           type="button"
@@ -325,35 +356,6 @@ const Tab = props => {
           {sidebarIcons[index % sidebarIcons.length]}
           <span className="sidebar-label">{component.meta.text}</span>
         </button>
-        // <TabTitleContainer
-        //   isHighlighted={isHighlighted}
-        //   className="dragdroppable-tab"
-        //   ref={dragSourceRef}
-        // >
-        //   <EditableTitle
-        //     title={component.meta.text}
-        //     defaultTitle={component.meta.defaultText}
-        //     placeholder={component.meta.placeholder}
-        //     canEdit={editMode && isFocused}
-        //     onSaveTitle={handleChangeText}
-        //     showTooltip={false}
-        //     editing={editMode && isFocused}
-        //   />
-        //   {!editMode && !embeddedMode && (
-        //     <AnchorLink
-        //       id={component.id}
-        //       dashboardId={dashboardId}
-        //       placement={index >= 5 ? 'left' : 'right'}
-        //     />
-        //   )}
-
-        //   {dropIndicatorProps && !draggingTabOnTab && (
-        //     <TitleDropIndicator
-        //       className={dropIndicatorProps.className}
-        //       data-test="title-drop-indicator"
-        //     />
-        //   )}
-        // </TabTitleContainer>
       );
     },
     [

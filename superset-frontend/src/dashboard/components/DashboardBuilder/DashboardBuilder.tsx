@@ -633,7 +633,7 @@ const DashboardBuilder = () => {
           <div css={css`
             padding: ${theme.gridUnit}px ${theme.gridUnit * 4}px;
             width: 95%;
-            margin-left: 6%;
+            margin-left: 5%;
           `}>
             <FilterBar
               orientation={FilterBarOrientation.Horizontal}
