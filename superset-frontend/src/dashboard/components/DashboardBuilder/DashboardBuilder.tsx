@@ -629,6 +629,7 @@ const DashboardBuilder = () => {
             {renderDraggableContent}
           </Droppable>
         </StyledHeader>
+        {/* EDITED HERE FOR FILTER BAR */}
         {showFilterBar && (
           <div css={css`
             padding: ${theme.gridUnit}px ${theme.gridUnit * 4}px;

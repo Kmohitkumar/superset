@@ -121,6 +121,7 @@ const DropIndicator = styled.div`
   border-radius: 2px;
 `;
 
+// EDITED HERE FOR SIDEBAR
 const StickySidebar = styled.div`
   ${({ theme }) => css`
     position: fixed;
@@ -136,6 +137,7 @@ const StickySidebar = styled.div`
     justify-content: flex-start;
     padding-top: ${theme.gridUnit * 3}px;
     border-radius: 0 ${theme.borderRadius * 10}px ${theme.borderRadius * 10}px 0;
+    overflow: scroll;
 
     .sidebar-logo {
       width: 80%;
@@ -517,6 +519,7 @@ const Tabs = props => {
             <DeleteComponentButton onDelete={handleDeleteComponent} />
           </HoverMenu>
         )}
+        {/* EDITED HERE SO THAT ONLY FIRST TAB IS SIDEBAR REMAINING ARE AT TOP */}
         {props.parentId.includes(TAB_TYPE) ? (
           <LineEditableTabs
             id={tabsComponent.id}

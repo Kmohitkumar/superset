@@ -314,6 +314,7 @@ const Tab = props => {
         dashboardId,
         embeddedMode,
       } = props;
+      // EDITED HERE FOR THE TAB BAR ICONS AND NAME UI
       return props.isSubTab ? (
         <TabTitleContainer
           isHighlighted={isHighlighted}
